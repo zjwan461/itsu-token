@@ -2,8 +2,7 @@ package com.itsu.itsutoken.checker;
 
 import com.itsu.itsutoken.annotation.Token;
 import com.itsu.itsutoken.exception.TokenCheckException;
-import com.itsu.itsutoken.table.TableSample;
-
+import com.itsu.itsutoken.table.RSATableSample;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
@@ -12,19 +11,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Aspect
-public class RSATokenChecker implements TokenChecker {
+public class RSATokenChecker extends TokenChecker<RSATableSample> {
     private static final Logger log = LoggerFactory.getLogger(RSATokenChecker.class);
 
-    private TableSample tableSample;
-
-    private String checkType;
-
-    public RSATokenChecker() {
-    }
-
-    public RSATokenChecker(TableSample tableSample, String checkType) {
-        this.tableSample = tableSample;
-        this.checkType = checkType;
+    public RSATokenChecker(RSATableSample tableSample) {
+        this.setTableSample(tableSample);
     }
 
     @Pointcut("@annotation(com.itsu.itsutoken.annotation.Token)")

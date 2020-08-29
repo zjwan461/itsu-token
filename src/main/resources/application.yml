@@ -1,4 +1,15 @@
+itsu-token:
+  enable: true
+  table-class: com.itsu.itsutoken.table.SimpleTableSample
+  table-name: tb_sys_token
+  type: simple
+  init:
+    auto-create-table: true
+    schema-location: classpath:schema/simpleSchema.sql
 spring:
   datasource:
-    schema:
-    - classpath:schema.sql
+    url: jdbc:mysql://localhost:3306/local_db
+    username: root
+    password: 123456
+debug: true
+#    driver-class-name: com.mysql.jdbc.Driver
