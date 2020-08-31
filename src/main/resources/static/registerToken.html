@@ -4,11 +4,73 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register</title>
-    <link rel="stylesheet" href="/webjars/bootstrap/3.3.7/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="/webjars/bootstrap/3.3.7/css/bootstrap.min.css"/>
     <script src="/webjars/jquery/3.1.1/jquery.min.js"></script>
     <script src="/webjars/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 </head>
 <body>
-    register token page
+<div class="container">
+    <h1 class="text-center">Token 注册</h1>
+    <div class="col-lg-8 col-lg-offset-2">
+
+        <form>
+            <div class="form-group">
+                <label for="system">System Name</label>
+                <input type="text" class="form-control" id="system" placeholder="System Name">
+            </div>
+            <div class="form-group">
+                <label for="type">Token类型</label>
+                <select class="form-control" id="type">
+                    <option value="Simple">Simple</option>
+                    <option value="RSA">RSA</option>
+                </select>
+            </div>
+            <div class="form-group" id="sik">
+                <label for="token">Token</label>
+                <input type="text" class="form-control " id="token" placeholder="Token" readonly>
+            </div>
+            <div class="form-group sr-only" id="prk">
+                <label for="privateKey">Private Key</label>
+                <input type="text" class="form-control " id="privateKey" placeholder="privateKey" readonly>
+            </div>
+            <div class="form-group sr-only" id="puk">
+                <label for="publicKey">public Key</label>
+                <input type="text" class="form-control " id="publicKey" placeholder="publicKey" readonly>
+            </div>
+            <button type="button" class="btn btn-success" id="genToken">构建token</button>
+            <button type="button" class="btn btn-info disabled" disabled title="你需要先构建token" id="sub">Submit</button>
+        </form>
+    </div>
+</div>
 </body>
+<script type="text/javascript">
+    $(function () {
+        // alert("jquery is ok")
+        $("#type").change(function () {
+            var type = $(this).val();
+            if (type == 'Simple') {
+                $('#sik').removeClass("sr-only");
+                $("#prk").addClass("sr-only");
+                $("#puk").addClass("sr-only");
+            } else if (type == 'RSA') {
+                $('#sik').addClass("sr-only");
+                $("#prk").removeClass("sr-only");
+                $("#puk").removeClass("sr-only");
+            }
+        });
+
+        $("#genToken").on('click', function () {
+            var system = $("#system").val();
+            if (system == null || system.length == 0) {
+                $("#system").focus().parent().addClass("has-error");
+                alert("System Name must not be empty");
+                return false;
+            }
+
+            //TODO CALL BACK END GENERATE TOKEN
+            
+
+        })
+    });
+</script>
 </html>
