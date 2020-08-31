@@ -68,17 +68,17 @@ public class ItsuTokenProperties {
     public enum Type {
         SIMPLE {
             @Override
-            public TokenChecker generateTokenChecher() {
+            public TokenChecker<? extends TableSample> generateTokenChecher() {
                 return new SimpleTokenChecker(new SimpleTableSample());
             }
         }, RSA {
             @Override
-            public TokenChecker generateTokenChecher() {
+            public TokenChecker<? extends TableSample> generateTokenChecher() {
                 return new RSATokenChecker(new RSATableSample());
             }
         };
 
-        public abstract TokenChecker generateTokenChecher();
+        public abstract TokenChecker<? extends TableSample> generateTokenChecher();
     }
 
     public static class Init {

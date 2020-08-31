@@ -1,7 +1,12 @@
 package com.itsu.itsutoken.configuration;
 
-import cn.hutool.core.collection.CollectionUtil;
+import java.util.Arrays;
+
+import javax.sql.DataSource;
+
 import com.itsu.itsutoken.checker.TokenChecker;
+import com.itsu.itsutoken.table.TableSample;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -11,13 +16,12 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 
-import javax.sql.DataSource;
-import java.util.Arrays;
+import cn.hutool.core.collection.CollectionUtil;
 
 @Configuration
 @EnableConfigurationProperties(ItsuTokenProperties.class)
 @EnableAspectJAutoProxy(proxyTargetClass = true)
-@ConditionalOnClass({TokenChecker.class})
+@ConditionalOnClass({ TokenChecker.class })
 @ConditionalOnProperty(name = "itsu-token.enable", havingValue = "true", matchIfMissing = true)
 public class ItsuTokenAutoConfiguration {
 
@@ -25,8 +29,9 @@ public class ItsuTokenAutoConfiguration {
     private ItsuTokenProperties properties;
 
     @Bean
-    public TokenChecker tokenChecker(DataSource dataSource, DataSourceProperties dataSourceProperties) {
-        TokenChecker tokenChecker = properties.getType().generateTokenChecher();
+    public TokenChecker<? extends TableSample> tokenChecker(DataSource dataSource,
+            DataSourceProperties dataSourceProperties) {
+        TokenChecker<? extends TableSample> tokenChecker = properties.getType().generateTokenChecher();
 
         if (properties.getInit().isAutoCreateTable()) {
             if (CollectionUtil.isEmpty(dataSourceProperties.getSchema())) {
