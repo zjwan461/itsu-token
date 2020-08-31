@@ -1,11 +1,8 @@
 package com.itsu.itsutoken.configuration;
 
-import com.itsu.itsutoken.checker.RSATokenChecker;
-import com.itsu.itsutoken.checker.SimpleTokenChecker;
-import com.itsu.itsutoken.checker.TokenChecker;
-import com.itsu.itsutoken.table.RSATableSample;
 import com.itsu.itsutoken.table.SimpleTableSample;
 import com.itsu.itsutoken.table.TableSample;
+
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.util.StringUtils;
 
@@ -16,13 +13,15 @@ public class ItsuTokenProperties {
 
     private boolean enable;
 
-    private String tableName = "tb_sys_token";
-
     private Class<? extends TableSample> tableClass = SimpleTableSample.class;
 
     private Type type;
 
     private Init init;
+
+    private boolean webRegister;
+
+    private System system;
 
     public boolean isEnable() {
         return enable;
@@ -30,14 +29,6 @@ public class ItsuTokenProperties {
 
     public void setEnable(boolean enable) {
         this.enable = enable;
-    }
-
-    public String getTableName() {
-        return tableName;
-    }
-
-    public void setTableName(String tableName) {
-        this.tableName = tableName;
     }
 
     public Type getType() {
@@ -65,20 +56,20 @@ public class ItsuTokenProperties {
         this.init = init;
     }
 
-    public enum Type {
-        SIMPLE {
-            @Override
-            public TokenChecker<? extends TableSample> generateTokenChecher() {
-                return new SimpleTokenChecker(new SimpleTableSample());
-            }
-        }, RSA {
-            @Override
-            public TokenChecker<? extends TableSample> generateTokenChecher() {
-                return new RSATokenChecker(new RSATableSample());
-            }
-        };
+    public boolean isWebRegister() {
+        return webRegister;
+    }
 
-        public abstract TokenChecker<? extends TableSample> generateTokenChecher();
+    public void setWebRegister(boolean webRegister) {
+        this.webRegister = webRegister;
+    }
+
+    public System getSystem() {
+        return system;
+    }
+
+    public void setSystem(System system) {
+        this.system = system;
     }
 
     public static class Init {
@@ -107,6 +98,19 @@ public class ItsuTokenProperties {
                     this.schemaLocation = "classpath:schema/rsaSchema.sql";
                 }
             }
+        }
+
+    }
+
+    public static class System {
+        private boolean encryptBase64;
+
+        public boolean isEncryptBase64() {
+            return encryptBase64;
+        }
+
+        public void setEncryptBase64(boolean encryptBase64) {
+            this.encryptBase64 = encryptBase64;
         }
 
     }

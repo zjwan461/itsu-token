@@ -8,9 +8,7 @@ import java.lang.annotation.Target;
 
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.TYPE)
-public @interface TableDesc {
-
-    String value() default "tb_sys_token";
-
+@Target(ElementType.FIELD)
+public @interface PublicKey {
+    String value() default "public_key";
 }

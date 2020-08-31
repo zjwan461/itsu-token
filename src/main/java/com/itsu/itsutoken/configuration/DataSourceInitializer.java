@@ -1,7 +1,10 @@
 package com.itsu.itsutoken.configuration;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import javax.sql.DataSource;
+
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.core.io.DefaultResourceLoader;
@@ -11,13 +14,7 @@ import org.springframework.jdbc.datasource.init.DatabasePopulatorUtils;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 import org.springframework.util.StringUtils;
 
-import javax.sql.DataSource;
-import java.util.List;
-import java.util.stream.Collectors;
-
-public class DataSourceInitializer {
-
-    private static final Logger logger = LoggerFactory.getLogger(DataSourceInitializer.class);
+public class DataSourceInitializer  {
 
     private final DataSource dataSource;
 
@@ -25,18 +22,15 @@ public class DataSourceInitializer {
 
     private final ResourceLoader resourceLoader;
 
-
     DataSourceInitializer(DataSource dataSource, DataSourceProperties properties, ResourceLoader resourceLoader) {
         this.dataSource = dataSource;
         this.properties = properties;
         this.resourceLoader = (resourceLoader != null) ? resourceLoader : new DefaultResourceLoader(null);
     }
 
-
     DataSourceInitializer(DataSource dataSource, DataSourceProperties properties) {
         this(dataSource, properties, null);
     }
-
 
     private void runScripts(List<Resource> resources, String username, String password) {
         if (resources.isEmpty()) {
@@ -61,7 +55,8 @@ public class DataSourceInitializer {
     }
 
     public void createSchema() {
-        List<Resource> resources = properties.getSchema().stream().map(schema -> resourceLoader.getResource(schema)).collect(Collectors.toList());
+        List<Resource> resources = properties.getSchema().stream().map(schema -> resourceLoader.getResource(schema))
+                .collect(Collectors.toList());
         runScripts(resources, properties.getUsername(), properties.getPassword());
     }
 }

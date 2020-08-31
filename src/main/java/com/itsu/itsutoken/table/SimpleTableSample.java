@@ -1,11 +1,18 @@
 package com.itsu.itsutoken.table;
 
+import com.itsu.itsutoken.annotation.SimpleToken;
+import com.itsu.itsutoken.annotation.SysName;
+import com.itsu.itsutoken.annotation.TableDesc;
+
+@TableDesc
 public class SimpleTableSample implements TableSample {
 
     private String id;
 
+    @SimpleToken
     private String token;
 
+    @SysName
     private String system_name;
 
     public String getId() {

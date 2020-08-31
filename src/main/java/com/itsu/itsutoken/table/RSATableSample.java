@@ -1,13 +1,22 @@
 package com.itsu.itsutoken.table;
 
+import com.itsu.itsutoken.annotation.PrivateKey;
+import com.itsu.itsutoken.annotation.PublicKey;
+import com.itsu.itsutoken.annotation.SysName;
+import com.itsu.itsutoken.annotation.TableDesc;
+
+@TableDesc
 public class RSATableSample implements TableSample {
 
     private String id;
 
+    @SysName
     private String system_name;
 
+    @PrivateKey
     private String private_key;
 
+    @PublicKey
     private String public_key;
 
     public String getId() {

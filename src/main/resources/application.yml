@@ -1,8 +1,10 @@
 itsu-token:
   enable: true
   table-class: com.itsu.itsutoken.table.SimpleTableSample
-  table-name: tb_sys_token
   type: simple
+  web-register: true
+  system:
+    encrypt-base64: true
   init:
     auto-create-table: true
     schema-location: classpath:schema/simpleSchema.sql

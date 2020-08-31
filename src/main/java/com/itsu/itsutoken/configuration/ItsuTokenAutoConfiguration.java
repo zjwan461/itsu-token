@@ -2,6 +2,8 @@ package com.itsu.itsutoken.configuration;
 
 import java.util.Arrays;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 
 import com.itsu.itsutoken.checker.TokenChecker;
@@ -15,6 +17,9 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
+import org.springframework.web.servlet.HandlerInterceptor;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import cn.hutool.core.collection.CollectionUtil;
 
@@ -43,6 +48,32 @@ public class ItsuTokenAutoConfiguration {
         }
 
         return tokenChecker;
+    }
+
+    @Bean
+    public WebMvcConfigurer tokenRegisterWebMvcConfigurer() {
+        return new WebMvcConfigurer() {
+
+            @Override
+            public void addInterceptors(InterceptorRegistry registry) {
+                registry.addInterceptor(new HandlerInterceptor() {
+
+                    @Override
+                    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
+                            throws Exception {
+                        String requestURI = request.getRequestURI();
+                        if (requestURI.endsWith("registerToken.html") && properties.isWebRegister()) {
+                            return true;
+                        } else {
+                            response.getWriter().write("itsu-token.web-register is not set to true");
+                            return false;
+                        }
+                    }
+
+                });
+            }
+
+        };
     }
 
 }
