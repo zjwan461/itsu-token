@@ -11,6 +11,7 @@ import com.itsu.itsutoken.annotation.Token;
 import com.itsu.itsutoken.configuration.ItsuTokenProperties;
 import com.itsu.itsutoken.exception.TokenCheckException;
 import com.itsu.itsutoken.table.SimpleTableSample;
+import com.itsu.itsutoken.util.ClassUtil;
 import com.itsu.itsutoken.util.ServletUtil;
 
 import org.aspectj.lang.JoinPoint;
@@ -54,13 +55,24 @@ public class SimpleTokenChecker extends TokenChecker<SimpleTableSample> {
         if (StringUtils.isEmpty(tableName)) {
             tableName = "tb_sys_token";
         }
-        String simpleToken = AnnotationUtil.getAnnotationValue(tableSample.getClass(), SimpleToken.class);
-        if (StringUtils.isEmpty(simpleToken)) {
-            simpleToken = "token";
+        String simpleToken = null;
+        try {
+            simpleToken = ClassUtil.getSimpleTokenValue(SimpleTableSample.class);
+            if (StringUtils.isEmpty(simpleToken)) {
+                simpleToken = "token";
+            }
+        } catch (Exception e) {
+            throw new TokenCheckException("get simple token field value fail", e);
         }
-        String sysName = AnnotationUtil.getAnnotationValue(tableSample.getClass(), SysName.class);
-        if (StringUtils.isEmpty(sysName)) {
-            sysName = "sys_name";
+
+        String sysName = null;
+        try {
+            sysName = ClassUtil.getSysValue(SimpleTableSample.class);
+            if (StringUtils.isEmpty(sysName)) {
+                sysName = "sys_name";
+            }
+        } catch (Exception e) {
+            throw new TokenCheckException("get system name field value fail", e);
         }
 
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
@@ -92,7 +104,7 @@ public class SimpleTokenChecker extends TokenChecker<SimpleTableSample> {
 
                 });
         if (count > 0) {
-            if (log.isDebugEnabled()) 
+            if (log.isDebugEnabled())
                 log.debug("token check pass, current request system is {}", systemStr);
         } else {
             throw new TokenCheckException("not valid system or token");

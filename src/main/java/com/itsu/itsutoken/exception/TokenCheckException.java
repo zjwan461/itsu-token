@@ -7,5 +7,13 @@ public class TokenCheckException extends Exception {
     public TokenCheckException(String message) {
         super(message);
     }
-    
+
+    public TokenCheckException(Throwable t) {
+        super(t);
+    }
+
+    public TokenCheckException(String message, Throwable t) {
+        super(message, t);
+    }
+
 }

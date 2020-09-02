@@ -1,76 +1,195 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register</title>
-    <link rel="stylesheet" href="/webjars/bootstrap/3.3.7/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="/webjars/bootstrap/3.3.7/css/bootstrap.min.css" />
     <script src="/webjars/jquery/3.1.1/jquery.min.js"></script>
     <script src="/webjars/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-</head>
-<body>
-<div class="container">
-    <h1 class="text-center">Token 注册</h1>
-    <div class="col-lg-8 col-lg-offset-2">
+    <link type="text/css" rel="stylesheet" />
+    <style>
+        .loading-box {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.7);
+            z-index: 999;
+        }
 
-        <form>
-            <div class="form-group">
-                <label for="system">System Name</label>
-                <input type="text" class="form-control" id="system" placeholder="System Name">
-            </div>
-            <div class="form-group">
-                <label for="type">Token类型</label>
-                <select class="form-control" id="type">
-                    <option value="Simple">Simple</option>
-                    <option value="RSA">RSA</option>
-                </select>
-            </div>
-            <div class="form-group" id="sik">
-                <label for="token">Token</label>
-                <input type="text" class="form-control " id="token" placeholder="Token" readonly>
-            </div>
-            <div class="form-group sr-only" id="prk">
-                <label for="privateKey">Private Key</label>
-                <input type="text" class="form-control " id="privateKey" placeholder="privateKey" readonly>
-            </div>
-            <div class="form-group sr-only" id="puk">
-                <label for="publicKey">public Key</label>
-                <input type="text" class="form-control " id="publicKey" placeholder="publicKey" readonly>
-            </div>
-            <button type="button" class="btn btn-success" id="genToken">构建token</button>
-            <button type="button" class="btn btn-info disabled" disabled title="你需要先构建token" id="sub">Submit</button>
-        </form>
+        .spinner-box {
+            width: 300px;
+            height: 300px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            -webkit-transform: translate(-50%, -50%);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container" style="display: none;">
+        <h1 class="text-center">Token 注册</h1>
+        <div class="col-lg-8 col-lg-offset-2">
+
+            <form>
+                <div class="form-group">
+                    <label for="system">System Name</label>
+                    <input type="text" class="form-control" id="system" placeholder="System Name">
+                </div>
+                <div class="form-group" id="sik">
+                    <label for="token">Token</label>
+                    <input type="text" class="form-control " id="token" placeholder="Token" readonly>
+                </div>
+                <div class="form-group" id="prk">
+                    <label for="privateKey">Private Key</label>
+                    <input type="text" class="form-control " id="privateKey" placeholder="privateKey" readonly>
+                </div>
+                <div class="form-group" id="puk">
+                    <label for="publicKey">Public Key</label>
+                    <input type="text" class="form-control " id="publicKey" placeholder="publicKey" readonly>
+                </div>
+                <button type="button" class="btn btn-success" id="genToken">构建token</button>
+                <button type="button" class="btn btn-info disabled" disabled title="你需要先构建token"
+                    id="sub">Submit</button>
+            </form>
+        </div>
     </div>
-</div>
+
+    <div class="loading-box">
+        <div class="spinner-box">
+            <img src="./img/loading.gif">
+        </div>
+    </div>
 </body>
 <script type="text/javascript">
     $(function () {
-        // alert("jquery is ok")
-        $("#type").change(function () {
-            var type = $(this).val();
-            if (type == 'Simple') {
-                $('#sik').removeClass("sr-only");
-                $("#prk").addClass("sr-only");
-                $("#puk").addClass("sr-only");
-            } else if (type == 'RSA') {
-                $('#sik').addClass("sr-only");
-                $("#prk").removeClass("sr-only");
-                $("#puk").removeClass("sr-only");
-            }
-        });
+        setTimeout(function () {
+            init();
+        }, 1000)
 
+
+        function init() {
+            // showLoading();
+
+            $.ajax({
+                type: "get",
+                url: "/token/type",
+                data: {},
+                success: function (data) {
+                    if (data.status) {
+                        if (data.type == 'simple') {
+                            $("#sik").removeClass("sr-only")
+                            $("#prk").addClass("sr-only")
+                            $("#puk").addClass("sr-only")
+                        } else if (data.type == 'rsa') {
+                            $("#sik").addClass("sr-only")
+                            $("#prk").removeClass("sr-only")
+                            $("#puk").removeClass("sr-only")
+                        }
+                        $(".container").css("display", "")
+                    } else {
+                        alert("初始化页面数据失败")
+                    }
+                },
+                error: function (error) {
+                    alert(error)
+                },
+                complete: function () {
+                    hideLoading();
+                }
+            });
+
+        }
+
+        function showLoading() {
+            $(".loading-box").css("display", "")
+        }
+
+        function hideLoading() {
+            $(".loading-box").css("display", "none");
+        }
+
+        // alert("jquery is ok")
         $("#genToken").on('click', function () {
             var system = $("#system").val();
             if (system == null || system.length == 0) {
-                $("#system").focus().parent().addClass("has-error");
+                $("#system").parent().addClass("has-error");
                 alert("System Name must not be empty");
                 return false;
             }
 
             //TODO CALL BACK END GENERATE TOKEN
-            
+            showLoading();
+            $.ajax({
+                type: "get",
+                url: "/token/generate/" + system,
+                data: {},
+                success: function (res) {
+                    if (res.status) {
+                        if (res.token) {
+                            $("#token").val(res.token)
+                        }
+                        if (res.privateKey) {
+                            $("#privateKey").val(res.privateKey);
+                        }
+                        if (res.publicKey) {
+                            $("#publicKey").val(res.publicKey);
+                        }
+
+                        var type = getType();
+                        if (type === 'simple') {
+                            var token = $("#token").val();
+                            if (token.length > 0) {
+                                $("#sub").removeClass("disabled").removeAttr("disabled").removeAttr("title");
+                            }
+                        } else if (type === 'rsa') {
+                            var privateKey = $("#privateKey").val();
+                            var publicKey = $("#publicKey").val();
+                            if (privateKey.length > 0 && publicKey.length > 0) {
+                                $("#sub").removeClass("disabled").removeAttr("disabled").removeAttr("title");
+                            }
+                        }
+                    }
+                },
+                error: function (error) {
+                    alert(error)
+                },
+                complete: function () {
+                    hideLoading();
+                }
+            });
 
         })
+
+        $(".form-control").focus(function () {
+            $(this).parent().removeClass("has-error");
+        })
+
+        function isVisiable(id) {
+            return !($("#" + id + "").hasClass("sr-only"))
+        }
+
+        function getType() {
+            var si = isVisiable("sik");
+            var rs = isVisiable("puk");
+            if (si && !rs) {
+                return "simple";
+            } else if (!si && rs) {
+                return "rsa";
+            } else {
+                return "unknown type"
+            }
+        }
     });
 </script>
+
 </html>
