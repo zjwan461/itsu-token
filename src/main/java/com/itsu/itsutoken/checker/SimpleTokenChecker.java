@@ -4,8 +4,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import com.itsu.itsutoken.annotation.SimpleToken;
-import com.itsu.itsutoken.annotation.SysName;
 import com.itsu.itsutoken.annotation.TableDesc;
 import com.itsu.itsutoken.annotation.Token;
 import com.itsu.itsutoken.configuration.ItsuTokenProperties;

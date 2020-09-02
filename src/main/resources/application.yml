@@ -1,13 +1,16 @@
 itsu-token:
   enable: true
-  table-class: com.itsu.itsutoken.table.SimpleTableSample
-  type: simple
-  web-register: true
+  table-class: com.itsu.itsutoken.table.RSATableSample
+  type: RSA
+  web-register:
+    enable: true
+    # register-url: registerToken
+    token-list-url: listToken 
   system:
     encrypt-base64: true
   init:
     auto-create-table: true
-    schema-location: classpath:schema/simpleSchema.sql
+    # schema-location: classpath:schema/simpleSchema.sql
 spring:
   datasource:
     url: jdbc:mysql://192.168.22.122:3306/local_db

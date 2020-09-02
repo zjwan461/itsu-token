@@ -4,9 +4,11 @@ import com.itsu.itsutoken.table.SimpleTableSample;
 import com.itsu.itsutoken.table.TableSample;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 @ConfigurationProperties(prefix = "itsu-token")
+@Component
 public class ItsuTokenProperties {
 
     private static Type typeName;
@@ -19,7 +21,7 @@ public class ItsuTokenProperties {
 
     private Init init;
 
-    private boolean webRegister;
+    private WebRegister webRegister;
 
     private System system;
 
@@ -56,20 +58,20 @@ public class ItsuTokenProperties {
         this.init = init;
     }
 
-    public boolean isWebRegister() {
-        return webRegister;
-    }
-
-    public void setWebRegister(boolean webRegister) {
-        this.webRegister = webRegister;
-    }
-
     public System getSystem() {
         return system;
     }
 
     public void setSystem(System system) {
         this.system = system;
+    }
+
+    public WebRegister getWebRegister() {
+        return webRegister;
+    }
+
+    public void setWebRegister(WebRegister webRegister) {
+        this.webRegister = webRegister;
     }
 
     public static class Init {
@@ -85,12 +87,8 @@ public class ItsuTokenProperties {
         }
 
         public String getSchemaLocation() {
-            return schemaLocation;
-        }
-
-        public void setSchemaLocation(String schemaLocation) {
             if (StringUtils.hasText(schemaLocation)) {
-                this.schemaLocation = schemaLocation;
+                return schemaLocation;
             } else {
                 if (ItsuTokenProperties.typeName == Type.SIMPLE) {
                     this.schemaLocation = "classpath:schema/simpleSchema.sql";
@@ -98,6 +96,11 @@ public class ItsuTokenProperties {
                     this.schemaLocation = "classpath:schema/rsaSchema.sql";
                 }
             }
+            return schemaLocation;
+        }
+
+        public void setSchemaLocation(String schemaLocation) {
+            this.schemaLocation = schemaLocation;
         }
 
     }
@@ -111,6 +114,55 @@ public class ItsuTokenProperties {
 
         public void setEncryptBase64(boolean encryptBase64) {
             this.encryptBase64 = encryptBase64;
+        }
+
+    }
+
+    public static class WebRegister {
+        private boolean enable;
+        private String registerUrl = "registerToken";
+        private String tokenListUrl = "tokenList";
+        private String user = "admin";
+        private String password = "password";
+
+        public boolean isEnable() {
+            return enable;
+        }
+
+        public void setEnable(boolean enable) {
+            this.enable = enable;
+        }
+
+        public String getRegisterUrl() {
+            return registerUrl;
+        }
+
+        public void setRegisterUrl(String registerUrl) {
+            this.registerUrl = registerUrl;
+        }
+
+        public String getTokenListUrl() {
+            return tokenListUrl;
+        }
+
+        public void setTokenListUrl(String tokenListUrl) {
+            this.tokenListUrl = tokenListUrl;
+        }
+
+        public String getUser() {
+            return user;
+        }
+
+        public void setUser(String user) {
+            this.user = user;
+        }
+
+        public String getPassword() {
+            return password;
+        }
+
+        public void setPassword(String password) {
+            this.password = password;
         }
 
     }

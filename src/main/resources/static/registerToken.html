@@ -58,8 +58,6 @@
                     <input type="text" class="form-control " id="publicKey" placeholder="publicKey" readonly>
                 </div>
                 <button type="button" class="btn btn-success" id="genToken">构建token</button>
-                <button type="button" class="btn btn-info disabled" disabled title="你需要先构建token"
-                    id="sub">Submit</button>
             </form>
         </div>
     </div>
@@ -101,7 +99,7 @@
                     }
                 },
                 error: function (error) {
-                    alert(error)
+                    alert(error.responseText)
                 },
                 complete: function () {
                     hideLoading();
@@ -127,6 +125,7 @@
                 return false;
             }
 
+            $(this).addClass("disabled").attr("disabled", "true")
             //TODO CALL BACK END GENERATE TOKEN
             showLoading();
             $.ajax({
@@ -145,26 +144,14 @@
                             $("#publicKey").val(res.publicKey);
                         }
 
-                        var type = getType();
-                        if (type === 'simple') {
-                            var token = $("#token").val();
-                            if (token.length > 0) {
-                                $("#sub").removeClass("disabled").removeAttr("disabled").removeAttr("title");
-                            }
-                        } else if (type === 'rsa') {
-                            var privateKey = $("#privateKey").val();
-                            var publicKey = $("#publicKey").val();
-                            if (privateKey.length > 0 && publicKey.length > 0) {
-                                $("#sub").removeClass("disabled").removeAttr("disabled").removeAttr("title");
-                            }
-                        }
                     }
                 },
                 error: function (error) {
-                    alert(error)
+                    alert(error.responseText)
                 },
                 complete: function () {
                     hideLoading();
+                    $("#genToken").removeClass("disabled").removeAttr("disabled")
                 }
             });
 

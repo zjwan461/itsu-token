@@ -1,7 +1,5 @@
 package com.itsu.itsutoken.controller;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -16,7 +14,6 @@ import com.itsu.itsutoken.util.ClassUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.lang.NonNull;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -29,7 +26,7 @@ import cn.hutool.crypto.asymmetric.RSA;
 
 @RestController
 @RequestMapping("/token")
-@ConditionalOnProperty(name = "itsu-token.web-register", havingValue = "true", matchIfMissing = false)
+@ConditionalOnProperty(name = "itsu-token.web-register.enable", havingValue = "true", matchIfMissing = false)
 public class TokenRegisterController {
 
     @Autowired
