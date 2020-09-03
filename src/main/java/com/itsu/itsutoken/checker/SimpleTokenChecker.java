@@ -76,6 +76,9 @@ public class SimpleTokenChecker extends TokenChecker<SimpleTableSample> {
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
         signature.getMethod();
         String system = ServletUtil.getSystem();
+        if (!StringUtils.hasText(system)) {
+            throw new TokenCheckException("request system is null or empty");
+        }
         if (properties.getSystem().isEncryptBase64()) {
             system = Base64.decodeStr(system);
         }
