@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register</title>
+    <title>Token Register</title>
     <!-- 最新版本的 Bootstrap 核心 CSS 文件 -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css"
         integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
@@ -69,6 +69,7 @@
                     <input type="text" class="form-control " id="publicKey" placeholder="publicKey" readonly>
                 </div>
                 <button type="button" class="btn btn-success" id="genToken">构建token</button>
+                <a href="javascript:;" class="btn btn-link" id="tokenList">Token列表</a>
             </form>
         </div>
     </div>
@@ -87,8 +88,6 @@
 
 
         function init() {
-            // showLoading();
-
             $.ajax({
                 type: "get",
                 url: "/token/type",
@@ -110,7 +109,7 @@
                     }
                 },
                 error: function (error) {
-                    alert(error.responseText)
+                    $.alert(error.responseText)
                 },
                 complete: function () {
                     hideLoading();
@@ -154,11 +153,29 @@
                         if (res.publicKey) {
                             $("#publicKey").val(res.publicKey);
                         }
-
+                    } else {
+                        $.confirm({
+                            title: 'Warning!',
+                            content: res.errorMsg,
+                            type: 'orange',
+                            typeAnimated: true,
+                            buttons: {
+                                close: function () {}
+                            }
+                        });
                     }
                 },
                 error: function (error) {
-                    $.alert(error.responseText)
+                    // console.log(error);
+                    $.confirm({
+                        title: 'Error!',
+                        content: error.responseJSON.error,
+                        type: 'red',
+                        typeAnimated: true,
+                        buttons: {
+                            close: function () {}
+                        }
+                    });
                 },
                 complete: function () {
                     hideLoading();
@@ -187,6 +204,18 @@
                 return "unknown type"
             }
         }
+
+        $("#tokenList").on('click', function () {
+            $.ajax({
+                type: "get",
+                url: "/tokenListUrl",
+                data: {},
+                success: function (res) {
+                    top.location.href = res;
+                }
+            });
+
+        })
     });
 </script>
 

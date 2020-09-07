@@ -23,10 +23,9 @@ public class BaseController {
     private ItsuTokenProperties properties;
 
     @RequestMapping("#{itsuTokenProperties.webRegister.registerUrl}")
-    public String idx() throws IOException {
+    public String registerPage() throws IOException {
         ResourceLoader resourceLoader = new DefaultResourceLoader();
-        Resource resource = null;
-        resource = resourceLoader.getResource("classpath:html/registerToken.html");
+        Resource resource = resourceLoader.getResource("classpath:html/registerToken.html");
         return IoUtil.read(resource.getInputStream(), "UTF-8");
     }
 
@@ -48,4 +47,22 @@ public class BaseController {
         Resource resource = resourceLoader.getResource("classpath:html/login.html");
         return IoUtil.read(resource.getInputStream(), "UTF-8");
     }
+
+    @GetMapping("/tokenListUrl")
+    public String listUrl() {
+        return properties.getWebRegister().getTokenListUrl();
+    }
+
+    @GetMapping("/tokenRegisterUrl")
+    public String listRegisterUrl() {
+        return properties.getWebRegister().getRegisterUrl();
+    }
+
+    @GetMapping("#{itsuTokenProperties.webRegister.tokenListUrl}")
+    public String tokenListPage() throws Exception {
+        ResourceLoader resourceLoader = new DefaultResourceLoader();
+        Resource resource = resourceLoader.getResource("classpath:html/tokenList.html");
+        return IoUtil.read(resource.getInputStream(), "UTF-8");
+    }
+
 }

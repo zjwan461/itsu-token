@@ -1,5 +1,8 @@
 package com.itsu.itsutoken.controller;
 
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -13,7 +16,9 @@ import com.itsu.itsutoken.util.ClassUtil;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.PreparedStatementCallback;
 import org.springframework.lang.NonNull;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -43,29 +48,39 @@ public class TokenRegisterController {
         if (properties.getType() == Type.SIMPLE) {
             tableName = AnnotationUtil.getAnnotationValue(SimpleTableSample.class, TableDesc.class);
             sysName = ClassUtil.getSysValue(SimpleTableSample.class);
-            String token = ClassUtil.getSimpleTokenValue(SimpleTableSample.class);
-            String generateToken = IdUtil.fastSimpleUUID();
-            jdbcTemplate.update("insert into " + tableName + " (id," + sysName + "," + token + ") value (?,?,?)",
-                    IdUtil.fastSimpleUUID(), system, generateToken);
-            map.put("token", generateToken);
+            if (this.checkSystem(sysName, system, tableName)) {
+                String token = ClassUtil.getSimpleTokenValue(SimpleTableSample.class);
+                String generateToken = IdUtil.fastSimpleUUID();
+                jdbcTemplate.update("insert into " + tableName + " (id," + sysName + "," + token + ") value (?,?,?)",
+                        IdUtil.fastSimpleUUID(), system, generateToken);
+                map.put("token", generateToken);
+                map.put("status", true);
+            } else {
+                map.put("errorMsg", "Duplicate system name");
+            }
         } else if (properties.getType() == Type.RSA) {
             tableName = AnnotationUtil.getAnnotationValue(RSATableSample.class, TableDesc.class);
             sysName = ClassUtil.getSysValue(RSATableSample.class);
-            String privateKey = ClassUtil.getPrivateKeyValue(RSATableSample.class);
-            String publicKey = ClassUtil.getPublicKeyValue(RSATableSample.class);
-            final RSA rsa = new RSA();
-            String generatePrivateKey = rsa.getPrivateKeyBase64();
-            String generatePublicKey = rsa.getPublicKeyBase64();
-            jdbcTemplate.update(
-                    "insert into " + tableName + " (id," + sysName + "," + privateKey + "," + publicKey
-                            + ") value (?,?,?,?)",
-                    IdUtil.fastSimpleUUID(), system, generatePrivateKey, generatePublicKey);
-            map.put("publicKey", generatePublicKey);
-            map.put("privateKey", generatePrivateKey);
+            if (this.checkSystem(sysName, system, tableName)) {
+                String privateKey = ClassUtil.getPrivateKeyValue(RSATableSample.class);
+                String publicKey = ClassUtil.getPublicKeyValue(RSATableSample.class);
+                final RSA rsa = new RSA();
+                String generatePrivateKey = rsa.getPrivateKeyBase64();
+                String generatePublicKey = rsa.getPublicKeyBase64();
+                jdbcTemplate.update(
+                        "insert into " + tableName + " (id," + sysName + "," + privateKey + "," + publicKey
+                                + ") value (?,?,?,?)",
+                        IdUtil.fastSimpleUUID(), system, generatePrivateKey, generatePublicKey);
+                map.put("publicKey", generatePublicKey);
+                map.put("privateKey", generatePrivateKey);
+                map.put("status", true);
+            } else {
+                map.put("errorMsg", "Duplicate system name");
+            }
         } else {
-            throw new TokenCheckException("unknown Type ");
+            throw new TokenCheckException("Unknown Type");
         }
-        map.put("status", true);
+
         return map;
     }
 
@@ -77,4 +92,20 @@ public class TokenRegisterController {
         return map;
     }
 
+    public boolean checkSystem(String sysName, String system, String tableName) {
+        Integer count = jdbcTemplate.execute("select count(1) num from " + tableName + " where " + sysName + " = ?",
+                new PreparedStatementCallback<Integer>() {
+
+                    @Override
+                    public Integer doInPreparedStatement(PreparedStatement ps)
+                            throws SQLException, DataAccessException {
+                        ps.setString(1, system);
+                        ResultSet rs = ps.executeQuery();
+                        rs.next();
+                        return rs.getInt("num");
+                    }
+
+                });
+        return count == 0;
+    }
 }

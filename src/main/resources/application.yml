@@ -5,7 +5,7 @@ itsu-token:
   web-register:
     enable: true
     # register-url: registerToken
-    token-list-url: listToken 
+    token-list-url: /listToken 
   system:
     encrypt-base64: true
   init:
