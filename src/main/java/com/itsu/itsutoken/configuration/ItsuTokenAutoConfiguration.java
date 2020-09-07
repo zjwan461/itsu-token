@@ -8,6 +8,7 @@ import javax.sql.DataSource;
 
 import com.itsu.itsutoken.checker.TokenChecker;
 import com.itsu.itsutoken.table.TableSample;
+import com.itsu.itsutoken.util.ServletUtil;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
@@ -51,6 +52,7 @@ public class ItsuTokenAutoConfiguration {
 
     @Bean
     public WebMvcConfigurer tokenRegisterWebMvcConfigurer() {
+        System.err.println(properties.getWebRegister().getRegisterUrl());
         return new WebMvcConfigurer() {
 
             @Override
@@ -60,22 +62,17 @@ public class ItsuTokenAutoConfiguration {
                     @Override
                     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
                             throws Exception {
+                        String registerUrl = properties.getWebRegister().getRegisterUrl();
+                        String tokenListUrl = properties.getWebRegister().getTokenListUrl();
                         String requestURI = request.getRequestURI();
-                        if (requestURI.endsWith(properties.getWebRegister().getRegisterUrl())) {
+                        if (requestURI.endsWith(registerUrl) || requestURI.endsWith(tokenListUrl)) {
                             if (properties.getWebRegister().isEnable()) {
-                                return true;
-                            } else {
-                                response.getWriter().write("itsu-token.web-register is not set to true");
-                                return false;
-                            }
-                        } else if (requestURI.endsWith("registerToken.html")) {
-                            if (properties.getWebRegister().isEnable()) {
-                                String login = (String) request.getSession().getAttribute("login");
-                                if ("yes".equalsIgnoreCase(login)) {
+                                if (ServletUtil.isLogin()) {
                                     return true;
                                 } else {
                                     response.getWriter().write("Authorization error");
                                     response.setStatus(401);
+                                    response.sendRedirect("login.html");
                                     return false;
                                 }
                             } else {
@@ -88,8 +85,8 @@ public class ItsuTokenAutoConfiguration {
                         }
 
                     }
-
-                });
+                }).addPathPatterns(properties.getWebRegister().getRegisterUrl(),
+                        properties.getWebRegister().getTokenListUrl());
             }
 
         };

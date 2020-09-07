@@ -5,9 +5,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register</title>
-    <link rel="stylesheet" href="/webjars/bootstrap/3.3.7/css/bootstrap.min.css" />
-    <script src="/webjars/jquery/3.1.1/jquery.min.js"></script>
-    <script src="/webjars/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <!-- 最新版本的 Bootstrap 核心 CSS 文件 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css"
+        integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.2/jquery-confirm.min.css">
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"
+        integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+
+    <!-- 最新的 Bootstrap 核心 JavaScript 文件 -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js"
+        integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous">
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.2/jquery-confirm.min.js"></script>
     <link type="text/css" rel="stylesheet" />
     <style>
         .loading-box {
@@ -64,7 +75,7 @@
 
     <div class="loading-box">
         <div class="spinner-box">
-            <img src="./img/loading.gif">
+            <img src="/img/loading.gif">
         </div>
     </div>
 </body>
@@ -95,7 +106,7 @@
                         }
                         $(".container").css("display", "")
                     } else {
-                        alert("初始化页面数据失败")
+                        $.alert("初始化页面数据失败")
                     }
                 },
                 error: function (error) {
@@ -121,7 +132,7 @@
             var system = $("#system").val();
             if (system == null || system.length == 0) {
                 $("#system").parent().addClass("has-error");
-                alert("System Name must not be empty");
+                $.alert("System Name must not be empty");
                 return false;
             }
 
@@ -147,7 +158,7 @@
                     }
                 },
                 error: function (error) {
-                    alert(error.responseText)
+                    $.alert(error.responseText)
                 },
                 complete: function () {
                     hideLoading();

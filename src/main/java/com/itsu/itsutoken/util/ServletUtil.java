@@ -108,9 +108,22 @@ public class ServletUtil {
      *
      * @return 结果
      */
-    public boolean hasToken() {
+    public static boolean hasToken() {
         String token = (String) getRequest().getAttribute("token");
         return token != null && !token.trim().equals("");
     }
 
+    /**
+     * 判断是否登录过系统
+     * 
+     * @return
+     */
+    public static boolean isLogin() {
+        String isLogin = (String) getSession().getAttribute("login");
+        return "yes".equalsIgnoreCase(isLogin);
+    }
+
+    public static void login() {
+        getSession().setAttribute("login", "yes");
+    }
 }
