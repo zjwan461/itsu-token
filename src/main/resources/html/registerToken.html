@@ -90,7 +90,7 @@
         function init() {
             $.ajax({
                 type: "get",
-                url: "/token/type",
+                url: "/tokenRegister/type",
                 data: {},
                 success: function (data) {
                     if (data.status) {
@@ -140,7 +140,7 @@
             showLoading();
             $.ajax({
                 type: "get",
-                url: "/token/generate/" + system,
+                url: "/tokenRegister/generate/" + system,
                 data: {},
                 success: function (res) {
                     if (res.status) {

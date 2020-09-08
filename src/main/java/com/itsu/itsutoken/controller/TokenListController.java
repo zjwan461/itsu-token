@@ -93,8 +93,9 @@ public class TokenListController {
                     });
             map.put("data", list);
             map.put("type", Type.RSA.name().toLowerCase());
-        } else
-            throw new TokenCheckException("Unknown type");
+        } else {
+            throw new TokenCheckException("Unsupported Type");
+        }
 
         return map;
 

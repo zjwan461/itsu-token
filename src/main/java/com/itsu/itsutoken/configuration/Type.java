@@ -10,15 +10,22 @@ import com.itsu.itsutoken.table.TableSample;
 public enum Type implements TokenCheckerGenerater {
     SIMPLE {
         @Override
-        public TokenChecker<? extends TableSample> generateTokenChecher() {
+        public TokenChecker<? extends TableSample> generateTokenChecker() {
             return new SimpleTokenChecker(new SimpleTableSample());
         }
     },
     RSA {
         @Override
-        public TokenChecker<? extends TableSample> generateTokenChecher() {
+        public TokenChecker<? extends TableSample> generateTokenChecker() {
             return new RSATokenChecker(new RSATableSample());
         }
+    },
+    CUSTOM {
+        @Override
+        public TokenChecker<? extends TableSample> generateTokenChecker() {
+            return null;
+        }
+
     };
 
 }

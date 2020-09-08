@@ -30,7 +30,7 @@ import cn.hutool.core.util.IdUtil;
 import cn.hutool.crypto.asymmetric.RSA;
 
 @RestController
-@RequestMapping("/token")
+@RequestMapping("/tokenRegister")
 @ConditionalOnProperty(name = "itsu-token.web-register.enable", havingValue = "true", matchIfMissing = false)
 public class TokenRegisterController {
 
