@@ -76,8 +76,11 @@
                 </thead>
                 <tbody id="data">
                 </tbody>
-                <tfoot></tfoot>
+                <tfoot>
+
+                </tfoot>
             </table>
+            <p id="msg" class="text-center"></p>
             <button type="button" class="btn btn-danger" id="delAll">全部删除</button>
             <a href="javascript:;" class="btn btn-link" id="tokenRegister"">注册token</a>
         </div>
@@ -107,6 +110,9 @@
                             $("#simpleToken").removeClass("hidden");
                             $("#privateKey").addClass("hidden");
                             $("#publicKey").addClass("hidden");
+                            if (res.data.length == 0) {
+                                $("#msg").append("no data found");
+                            }
                             res.data.forEach(ele => {
                                 var content = "<tr>";
                                 for (const e in ele) {
@@ -122,6 +128,10 @@
                             $("#simpleToken").addClass("hidden");
                             $("#privateKey").removeClass("hidden");
                             $("#publicKey").removeClass("hidden");
+                            if (res.data.length == 0) {
+                                $("#msg").append("no data found");
+                            }
+
                             res.data.forEach(ele => {
                                 var content = "<tr>";
                                 for (const e in ele) {
@@ -181,6 +191,25 @@
                                     btnClass: 'btn-blue',
                                     action: function () {
                                         //TODO DELETE BY ID
+                                        $.ajax({
+                                            type: "delete",
+                                            url: "/tokenData/" + id,
+                                            data: {},
+                                            success: function (res) {
+                                                $.dialog(res);
+                                                setTimeout(
+                                                    function () {
+                                                        window
+                                                            .location
+                                                            .reload();
+                                                    }, 500);
+                                            },
+                                            error: function (error) {
+                                                $.dialog(error
+                                                    .responseText
+                                                    );
+                                            }
+                                        });
                                     }
                                 },
                                 cancel: function () {
@@ -226,6 +255,20 @@
                         btnClass: 'btn-blue',
                         action: function () {
                             //TODO DELETE ALL
+                            $.ajax({
+                                type: "delete",
+                                url: "/tokenData/all",
+                                data: {},
+                                success: function (res) {
+                                    $.dialog(res);
+                                    setTimeout(function () {
+                                        window.location.reload();
+                                    }, 500);
+                                },
+                                error: function (error) {
+                                    $.dialog(error.responseText);
+                                }
+                            });
                         }
                     },
                     cancel: function () {

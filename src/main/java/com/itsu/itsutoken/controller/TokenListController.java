@@ -20,7 +20,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCallback;
+import org.springframework.lang.NonNull;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -92,6 +95,7 @@ public class TokenListController {
                             }
                             return list;
                         }
+
                     });
             map.put("data", list);
             map.put("type", Type.RSA.name().toLowerCase());
@@ -101,5 +105,33 @@ public class TokenListController {
 
         return map;
 
+    }
+
+    @DeleteMapping("/{id}")
+    public String deleteById(@PathVariable("id") @NonNull String id) throws Exception {
+        // jdbcTemplate.update("delete from ", args)
+        String tableName = "tb_sys_token";
+        String idName = "id";
+        if (properties.getType() == Type.SIMPLE) {
+            tableName = AnnotationUtil.getAnnotationValue(SimpleTableSample.class, TableDesc.class);
+            idName = ClassUtil.getId(SimpleTableSample.class);
+        } else if (properties.getType() == Type.RSA) {
+            tableName = AnnotationUtil.getAnnotationValue(RSATableSample.class, TableDesc.class);
+            idName = ClassUtil.getId(RSATableSample.class);
+        }
+        jdbcTemplate.update("delete from " + tableName + " where " + idName + " = ? ", id);
+        return "success";
+    }
+
+    @DeleteMapping("/all")
+    public String deleteAll() {
+        String tableName = "tb_sys_token";
+        if (properties.getType() == Type.SIMPLE) {
+            tableName = AnnotationUtil.getAnnotationValue(SimpleTableSample.class, TableDesc.class);
+        } else if (properties.getType() == Type.RSA) {
+            tableName = AnnotationUtil.getAnnotationValue(RSATableSample.class, TableDesc.class);
+        }
+        jdbcTemplate.update("delete from " + tableName);
+        return "success";
     }
 }
