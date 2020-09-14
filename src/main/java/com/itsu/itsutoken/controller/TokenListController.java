@@ -46,6 +46,7 @@ public class TokenListController {
             sysName = ClassUtil.getSysValue(SimpleTableSample.class);
             final String tokenValue = ClassUtil.getSimpleTokenValue(SimpleTableSample.class);
             final String sysNameStr = sysName;
+            final String tableId = ClassUtil.getId(SimpleTableSample.class);
             List<SimpleTableSample> list = jdbcTemplate.execute("select * from " + tableName,
                     new PreparedStatementCallback<List<SimpleTableSample>>() {
 
@@ -56,7 +57,7 @@ public class TokenListController {
                             ResultSet rs = ps.executeQuery();
                             while (rs.next()) {
                                 SimpleTableSample tableSample = new SimpleTableSample();
-                                tableSample.setId(rs.getString("id"));
+                                tableSample.setId(rs.getString(tableId));
                                 tableSample.setSystem_name(rs.getString(sysNameStr));
                                 tableSample.setToken(rs.getString(tokenValue));
                                 list.add(tableSample);
@@ -72,6 +73,7 @@ public class TokenListController {
             final String privateKeyValue = ClassUtil.getPrivateKeyValue(RSATableSample.class);
             final String publicKeyValue = ClassUtil.getPublicKeyValue(RSATableSample.class);
             final String sysNameStr = sysName;
+            final String tableId = ClassUtil.getId(RSATableSample.class);
             List<RSATableSample> list = jdbcTemplate.execute("select * from " + tableName,
                     new PreparedStatementCallback<List<RSATableSample>>() {
 
@@ -82,7 +84,7 @@ public class TokenListController {
                             ResultSet rs = ps.executeQuery();
                             while (rs.next()) {
                                 RSATableSample rsaTableSample = new RSATableSample();
-                                rsaTableSample.setId(rs.getString("id"));
+                                rsaTableSample.setId(rs.getString(tableId));
                                 rsaTableSample.setSystem_name(rs.getString(sysNameStr));
                                 rsaTableSample.setPrivate_key(rs.getString(privateKeyValue));
                                 rsaTableSample.setPublic_key(rs.getString(publicKeyValue));

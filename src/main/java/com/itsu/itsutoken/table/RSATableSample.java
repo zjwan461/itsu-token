@@ -4,10 +4,12 @@ import com.itsu.itsutoken.annotation.PrivateKey;
 import com.itsu.itsutoken.annotation.PublicKey;
 import com.itsu.itsutoken.annotation.SysName;
 import com.itsu.itsutoken.annotation.TableDesc;
+import com.itsu.itsutoken.annotation.TableId;
 
 @TableDesc
 public class RSATableSample implements TableSample {
 
+    @TableId
     private String id;
 
     @SysName

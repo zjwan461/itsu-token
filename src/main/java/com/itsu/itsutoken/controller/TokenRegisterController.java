@@ -9,6 +9,7 @@ import java.util.Map;
 import com.itsu.itsutoken.annotation.TableDesc;
 import com.itsu.itsutoken.configuration.ItsuTokenProperties;
 import com.itsu.itsutoken.configuration.Type;
+import com.itsu.itsutoken.domain.IdType;
 import com.itsu.itsutoken.exception.TokenCheckException;
 import com.itsu.itsutoken.table.RSATableSample;
 import com.itsu.itsutoken.table.SimpleTableSample;
@@ -45,14 +46,19 @@ public class TokenRegisterController {
         Map<String, Object> map = new HashMap<>();
         String tableName = "tb_sys_token";
         String sysName = "sys_name";
+        String id = "id";
+        IdType idType = IdType.FAST_SIMPLE_UUID;
         if (properties.getType() == Type.SIMPLE) {
             tableName = AnnotationUtil.getAnnotationValue(SimpleTableSample.class, TableDesc.class);
             sysName = ClassUtil.getSysValue(SimpleTableSample.class);
+            id = ClassUtil.getId(SimpleTableSample.class);
+            idType = ClassUtil.getIdStrategy(SimpleTableSample.class);
             if (this.checkSystem(sysName, system, tableName)) {
                 String token = ClassUtil.getSimpleTokenValue(SimpleTableSample.class);
                 String generateToken = IdUtil.fastSimpleUUID();
-                jdbcTemplate.update("insert into " + tableName + " (id," + sysName + "," + token + ") value (?,?,?)",
-                        IdUtil.fastSimpleUUID(), system, generateToken);
+                jdbcTemplate.update(
+                        "insert into " + tableName + " ( " + id + "," + sysName + "," + token + ") value (?,?,?)",
+                        idType.generateId(), system, generateToken);
                 map.put("token", generateToken);
                 map.put("status", true);
             } else {
@@ -61,6 +67,8 @@ public class TokenRegisterController {
         } else if (properties.getType() == Type.RSA) {
             tableName = AnnotationUtil.getAnnotationValue(RSATableSample.class, TableDesc.class);
             sysName = ClassUtil.getSysValue(RSATableSample.class);
+            id = ClassUtil.getId(RSATableSample.class);
+            idType = ClassUtil.getIdStrategy(RSATableSample.class);
             if (this.checkSystem(sysName, system, tableName)) {
                 String privateKey = ClassUtil.getPrivateKeyValue(RSATableSample.class);
                 String publicKey = ClassUtil.getPublicKeyValue(RSATableSample.class);
@@ -68,9 +76,9 @@ public class TokenRegisterController {
                 String generatePrivateKey = rsa.getPrivateKeyBase64();
                 String generatePublicKey = rsa.getPublicKeyBase64();
                 jdbcTemplate.update(
-                        "insert into " + tableName + " (id," + sysName + "," + privateKey + "," + publicKey
+                        "insert into " + tableName + " ( " + id + "," + sysName + "," + privateKey + "," + publicKey
                                 + ") value (?,?,?,?)",
-                        IdUtil.fastSimpleUUID(), system, generatePrivateKey, generatePublicKey);
+                        idType.generateId(), system, generatePrivateKey, generatePublicKey);
                 map.put("publicKey", generatePublicKey);
                 map.put("privateKey", generatePrivateKey);
                 map.put("status", true);

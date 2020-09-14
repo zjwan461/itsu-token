@@ -3,10 +3,12 @@ package com.itsu.itsutoken.table;
 import com.itsu.itsutoken.annotation.SimpleToken;
 import com.itsu.itsutoken.annotation.SysName;
 import com.itsu.itsutoken.annotation.TableDesc;
+import com.itsu.itsutoken.annotation.TableId;
 
 @TableDesc
 public class SimpleTableSample implements TableSample {
 
+    @TableId
     private String id;
 
     @SimpleToken
