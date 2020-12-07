@@ -47,7 +47,8 @@ spring:
 debug: true
 #    driver-class-name: com.mysql.jdbc.Driver
 ```
-3.  默认提供了Simple & RSA 两种token校验模式，也支持自定义校验,需要继承com.itsu.itsutoken.checker.TokenChecker抽象类并实现check()方法。这里留的自由度比较大，使用者可以随意发挥
+3.  默认提供了Simple & RSA 两种token校验模式，也支持自定义校验,需要继承com.itsu.itsutoken.checker.TokenChecker抽象类并实现check()方法。这里留的自由度比较大，使用者可以随意发挥。<br>
+目前，自定义TokenChecker暂不支持token可视化管理。
 
 #### 参与贡献
 
