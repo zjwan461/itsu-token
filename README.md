@@ -9,7 +9,7 @@ itsu-token作为SpringBoot 的starter 模块依赖SpringBoot环境。使用了hu
 
 #### 安装教程
 
-1.  git clone 
+1.  git clone https://github.com/zjwan461/itsu-token.git
 2.  mvn clean install
 3.  在需要使用的项目中添加新构建的maven依赖
 ```xml
