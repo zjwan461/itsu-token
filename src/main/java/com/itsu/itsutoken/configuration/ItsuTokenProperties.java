@@ -119,7 +119,7 @@ public class ItsuTokenProperties {
     }
 
     public static class WebRegister {
-        private boolean enable;
+        private boolean enable = false;
         private String registerUrl = "/registerToken.html";
         private String tokenListUrl = "/tokenList.html";
         private String user = "admin";

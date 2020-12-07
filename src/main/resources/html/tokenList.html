@@ -113,17 +113,21 @@
                             if (res.data.length == 0) {
                                 $("#msg").append("no data found");
                             }
-                            res.data.forEach(ele => {
+                            console.log(res)
+
+                            $.each(res.data, function(index, item){
                                 var content = "<tr>";
-                                for (const e in ele) {
-                                    content += "<td>" + ele[e] + "</td>\n";
-                                }
+                                content += "<td>" + item.id + "</td>\n";
+                                content += "<td>" + item.system_name + "</td>\n";
+                                content += "<td>" + item.token + "</td>\n";
                                 content += `<td>
-                                                <button type="button" class="btn btn-warning btn-xs single-del">删除</button>
-                                            </td>`;
+                                    <button type="button" class="btn btn-warning btn-xs single-del">删除</button>
+                                </td>`;
                                 content += "</tr>"
                                 $("#data").append(content);
-                            });
+                            })
+
+                            
                         } else if (res.type == 'rsa') {
                             $("#simpleToken").addClass("hidden");
                             $("#privateKey").removeClass("hidden");

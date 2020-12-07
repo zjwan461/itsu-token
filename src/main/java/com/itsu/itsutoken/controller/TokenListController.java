@@ -4,7 +4,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -41,7 +41,7 @@ public class TokenListController {
 
     @GetMapping("/list")
     public Map<String, Object> listData() throws Exception {
-        Map<String, Object> map = new HashMap<>();
+        Map<String, Object> map = new LinkedHashMap<>();
         String tableName = "tb_sys_token";
         String sysName = "sys_name";
         if (properties.getType() == Type.SIMPLE) {
