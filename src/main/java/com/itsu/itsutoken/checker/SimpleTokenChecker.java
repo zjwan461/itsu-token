@@ -20,15 +20,19 @@ import org.aspectj.lang.reflect.MethodSignature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCallback;
+import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import cn.hutool.core.annotation.AnnotationUtil;
 import cn.hutool.core.codec.Base64;
 
 @Aspect
+@Component
+@ConditionalOnProperty(name = "type", prefix = "itsu-token", havingValue = "SIMPLE", matchIfMissing = false)
 public class SimpleTokenChecker extends TokenChecker<SimpleTableSample> {
     private static final Logger log = LoggerFactory.getLogger(SimpleTokenChecker.class);
 
@@ -42,8 +46,8 @@ public class SimpleTokenChecker extends TokenChecker<SimpleTableSample> {
     public void rule() {
     }
 
-    public SimpleTokenChecker(SimpleTableSample tableSample) {
-        this.setTableSample(tableSample);
+    public SimpleTokenChecker() {
+        this.setTableSample(new SimpleTableSample());
     }
 
     @Override

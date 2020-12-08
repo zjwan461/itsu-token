@@ -4,11 +4,9 @@ import com.itsu.itsutoken.table.SimpleTableSample;
 import com.itsu.itsutoken.table.TableSample;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 @ConfigurationProperties(prefix = "itsu-token")
-@Component
 public class ItsuTokenProperties {
 
     private static Type typeName;
@@ -106,7 +104,7 @@ public class ItsuTokenProperties {
     }
 
     public static class System {
-        private boolean encryptBase64;
+        private boolean encryptBase64 = false;
 
         public boolean isEncryptBase64() {
             return encryptBase64;

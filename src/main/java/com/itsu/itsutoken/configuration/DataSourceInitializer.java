@@ -14,7 +14,7 @@ import org.springframework.jdbc.datasource.init.DatabasePopulatorUtils;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 import org.springframework.util.StringUtils;
 
-public class DataSourceInitializer  {
+public class DataSourceInitializer {
 
     private final DataSource dataSource;
 

@@ -3,7 +3,6 @@ package com.itsu.itsutoken.configuration;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
@@ -13,14 +12,16 @@ import com.itsu.itsutoken.exception.TokenConfigureException;
 import com.itsu.itsutoken.table.TableSample;
 import com.itsu.itsutoken.util.ServletUtil;
 
-import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
+import org.springframework.context.annotation.Primary;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -30,18 +31,28 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
 
 @Configuration
-@EnableAspectJAutoProxy(proxyTargetClass = true)
 @ConditionalOnClass({ TokenChecker.class, DataSourceAutoConfiguration.class })
 @ConditionalOnProperty(name = "itsu-token.enable", havingValue = "true", matchIfMissing = true)
-@AutoConfigureAfter(DataSourceAutoConfiguration.class)
+@EnableConfigurationProperties({ ItsuTokenProperties.class })
+@EnableAspectJAutoProxy(proxyTargetClass = true)
 public class ItsuTokenAutoConfiguration {
 
-    @Resource
-    private ItsuTokenProperties properties;
+    private final ItsuTokenProperties properties;
+
+    public ItsuTokenAutoConfiguration(ItsuTokenProperties properties) {
+        this.properties = properties;
+    }
 
     @Bean
-    public TokenChecker<? extends TableSample> tokenChecker(DataSource dataSource,
-            DataSourceProperties dataSourceProperties) throws TokenConfigureException {
+    @Primary
+    @ConditionalOnMissingBean(name = "itsuTokenProperties")
+    public ItsuTokenProperties itsuTokenProperties() {
+        return this.properties;
+    }
+
+    @Bean
+    @ConditionalOnMissingBean(TokenChecker.class)
+    public TokenChecker<? extends TableSample> tokenChecker() throws TokenConfigureException {
         TokenChecker<? extends TableSample> tokenChecker = null;
         Type type = properties.getType();
         if (type == Type.CUSTOM) {
@@ -52,19 +63,30 @@ public class ItsuTokenAutoConfiguration {
             }
             tokenChecker = tokenCheckerGenerater.generateTokenChecker();
         } else {
-            tokenChecker = type.generateTokenChecker();
+            throw new TokenConfigureException(
+                    " itsu-token.type must be RSA / SIMPLE / CUSTOM, myabe you are not use component scan com.itsu.itsutoken pacakge ");
+            // tokenChecker = type.generateTokenChecker();
         }
 
+        // tokenChecker.setJdbcTemplate(jdbcTemplate);
+        // tokenChecker.setProperties(properties);
+
+        return tokenChecker;
+    }
+
+    @Bean
+    public DataSourceInitializer dataSourceInitializer(DataSource dataSource,
+            DataSourceProperties dataSourceProperties) {
+        DataSourceInitializer dataSourceInitializer = new DataSourceInitializer(dataSource, dataSourceProperties);
         if (properties.getInit().isAutoCreateTable()) {
+            // 如果spring jdbc的schema sql脚本为null，则执行itsu-token中设置的schema脚本
             if (CollectionUtil.isEmpty(dataSourceProperties.getSchema())) {
                 String schemaLocation = properties.getInit().getSchemaLocation();
                 dataSourceProperties.setSchema(Arrays.asList(schemaLocation));
             }
-            DataSourceInitializer dataSourceInitializer = new DataSourceInitializer(dataSource, dataSourceProperties);
             dataSourceInitializer.createSchema();
         }
-
-        return tokenChecker;
+        return dataSourceInitializer;
     }
 
     @Bean
@@ -114,4 +136,5 @@ public class ItsuTokenAutoConfiguration {
         public static final List<String> LOGIN_IN_URLS = Arrays.asList("/tokenListUrl", "/tokenRegisterUrl",
                 "/tokenData/**", "/tokenRegister/**");
     }
+
 }

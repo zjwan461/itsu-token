@@ -8,6 +8,7 @@ class ItsuTokenApplicationTests {
 
 	@Test
 	void contextLoads() {
+		System.out.println("sdsfsdfs");
 	}
 
 }

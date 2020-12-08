@@ -1,13 +1,13 @@
 package com.itsu.itsutoken.checker;
 
 import com.itsu.itsutoken.exception.TokenCheckException;
-
 import com.itsu.itsutoken.table.TableSample;
+
 import org.aspectj.lang.JoinPoint;
 
 public abstract class TokenChecker<T extends TableSample> {
 
-    private T tableSample;
+    protected T tableSample;
 
     public abstract void check(JoinPoint joinPoint) throws TokenCheckException;
 

@@ -21,9 +21,11 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCallback;
+import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import cn.hutool.core.annotation.AnnotationUtil;
@@ -33,17 +35,19 @@ import cn.hutool.crypto.asymmetric.KeyType;
 import cn.hutool.crypto.asymmetric.RSA;
 
 @Aspect
+@Component
+@ConditionalOnProperty(name = "type", prefix = "itsu-token", havingValue = "RSA", matchIfMissing = false)
 public class RSATokenChecker extends TokenChecker<RSATableSample> {
     private static final Logger log = LoggerFactory.getLogger(RSATokenChecker.class);
 
     @Autowired
-    private ItsuTokenProperties properties;
-
-    @Autowired
     private JdbcTemplate jdbcTemplate;
 
-    public RSATokenChecker(RSATableSample tableSample) {
-        this.setTableSample(tableSample);
+    @Autowired
+    private ItsuTokenProperties properties;
+
+    public RSATokenChecker() {
+        this.setTableSample(new RSATableSample());
     }
 
     @Pointcut("@annotation(com.itsu.itsutoken.annotation.Token)")
@@ -98,10 +102,11 @@ public class RSATokenChecker extends TokenChecker<RSATableSample> {
         }
 
         final String systemStr = system;
+        final String sysNameStr = sysName;
         final String privateKeyStr = privateKeyName;
         final String publicKeyStr = publicKeyName;
-        List<RSATableSample> rsaList = jdbcTemplate.execute(
-                "select " + privateKeyName + "," + publicKeyName + " from " + tableName + " where " + sysName + " = ? ",
+        List<RSATableSample> rsaList = jdbcTemplate.execute("select " + sysName + "," + privateKeyName + ","
+                + publicKeyName + " from " + tableName + " where " + sysName + " = ? ",
                 new PreparedStatementCallback<List<RSATableSample>>() {
 
                     @Override
@@ -114,7 +119,7 @@ public class RSATokenChecker extends TokenChecker<RSATableSample> {
                             RSATableSample rsaTs = new RSATableSample();
                             rsaTs.setPrivate_key(rs.getString(privateKeyStr));
                             rsaTs.setPublic_key(rs.getString(publicKeyStr));
-                            rsaTs.setSystem_name(rs.getString(systemStr));
+                            rsaTs.setSystem_name(rs.getString(sysNameStr));
                             list.add(rsaTs);
                         }
                         return list;
@@ -135,12 +140,19 @@ public class RSATokenChecker extends TokenChecker<RSATableSample> {
                     break;
                 }
             } catch (Exception e) {
-                log.debug("decrypt Rsa token fail", e);
+                if (log.isDebugEnabled()) {
+                    log.debug("decrypt Rsa token fail", e);
+                }
             }
         }
 
         if (!result) {
             throw new TokenCheckException("check rsa token fail, Verification failed ");
+        }
+
+        if (log.isDebugEnabled()) {
+            log.debug(" check rsa success, which request system is {}",
+                    properties.getSystem().isEncryptBase64() ? Base64.decodeStr(system) : system);
         }
     }
 
