@@ -12,63 +12,63 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
-import org.springframework.context.annotation.Primary;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import com.itsu.itsutoken.checker.RSATokenChecker;
+import com.itsu.itsutoken.checker.SimpleTokenChecker;
 import com.itsu.itsutoken.checker.TokenChecker;
+import com.itsu.itsutoken.controller.BaseController;
+import com.itsu.itsutoken.controller.TokenListController;
+import com.itsu.itsutoken.controller.TokenRegisterController;
 import com.itsu.itsutoken.exception.TokenConfigureException;
 import com.itsu.itsutoken.table.TableSample;
 import com.itsu.itsutoken.table.TableSampleAdaptor;
-import com.itsu.itsutoken.util.IocUtil;
 import com.itsu.itsutoken.util.ServletUtil;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.extra.spring.SpringUtil;
 
 @Configuration
 @ConditionalOnClass({ TokenChecker.class, DataSourceAutoConfiguration.class })
 @ConditionalOnProperty(name = "itsu-token.enable", havingValue = "true", matchIfMissing = false)
-@EnableConfigurationProperties({ ItsuTokenProperties.class })
 @EnableAspectJAutoProxy(proxyTargetClass = true)
 public class ItsuTokenAutoConfiguration {
 
-	private final ItsuTokenProperties properties;
-
-	public ItsuTokenAutoConfiguration(ItsuTokenProperties properties) {
-		this.properties = properties;
-	}
-
 	@Bean
-	@Primary
-	@ConditionalOnMissingBean(name = "itsuTokenProperties")
 	public ItsuTokenProperties itsuTokenProperties() {
-		return this.properties;
+		return new ItsuTokenProperties();
 	}
 
 	@Bean
-	@ConditionalOnMissingBean(TokenChecker.class)
-	public TokenChecker<? extends TableSample> tokenChecker() throws TokenConfigureException {
-		TokenChecker<? extends TableSample> tokenChecker = null;
-		Type type = properties.getType();
-		if (type == Type.CUSTOM) {
-			TokenCheckerGenerater tokenCheckerGenerater = IocUtil.getBean(TokenCheckerGenerater.class);
-			if (tokenCheckerGenerater == null) {
-				throw new TokenConfigureException(
-						"You must create a bean implements TokenCheckerGenerater and aware into IOC because of the token type is CUSTOM");
-			}
-			tokenChecker = tokenCheckerGenerater.generateTokenChecker();
-		} else {
-			throw new TokenConfigureException("As your configuration, the itsu-token.type=" + type.name()
-					+ ", but cant not found a implement in IOC container. Maybe you are not use component scan com.itsu.itsutoken pacakge ");
-		}
+	@ConditionalOnProperty(name = "type", prefix = "itsu-token", havingValue = "CUSTOM", matchIfMissing = false)
+	public TokenChecker<? extends TableSample> tokenChecker(ItsuTokenProperties properties)
+			throws TokenConfigureException {
 
+		TokenCheckerGenerater tokenCheckerGenerater = SpringUtil.getBean(TokenCheckerGenerater.class);
+		if (tokenCheckerGenerater == null) {
+			throw new TokenConfigureException(
+					"You must create a bean implements TokenCheckerGenerater and aware into IOC because of the token type is CUSTOM");
+		}
+		TokenChecker<? extends TableSample> tokenChecker = tokenCheckerGenerater.generateTokenChecker();
 		return tokenChecker;
+	}
+
+	@Bean
+	@ConditionalOnProperty(name = "type", prefix = "itsu-token", havingValue = "SIMPLE", matchIfMissing = true)
+	public SimpleTokenChecker simpleTokenChecker() {
+		return new SimpleTokenChecker();
+	}
+
+	@Bean
+	@ConditionalOnProperty(name = "type", prefix = "itsu-token", havingValue = "RSA", matchIfMissing = false)
+	public RSATokenChecker RSATokenChecker() {
+		return new RSATokenChecker();
 	}
 
 	@Bean
@@ -79,8 +79,8 @@ public class ItsuTokenAutoConfiguration {
 	}
 
 	@Bean
-	public DataSourceInitializer dataSourceInitializer(DataSource dataSource,
-			DataSourceProperties dataSourceProperties) {
+	public DataSourceInitializer dataSourceInitializer(DataSource dataSource, DataSourceProperties dataSourceProperties,
+			ItsuTokenProperties properties) {
 		DataSourceInitializer dataSourceInitializer = new DataSourceInitializer(dataSource, dataSourceProperties);
 		if (properties.getInit().isAutoCreateTable()) {
 			// 如果spring jdbc的schema sql脚本为null，则执行itsu-token中设置的schema脚本
@@ -94,7 +94,30 @@ public class ItsuTokenAutoConfiguration {
 	}
 
 	@Bean
-	public WebMvcConfigurer tokenRegisterWebMvcConfigurer() {
+	@ConditionalOnProperty(name = "itsu-token.web-register.enable", havingValue = "true", matchIfMissing = false)
+	public BaseController BaseController() {
+		return new BaseController();
+	}
+
+	@Bean
+	@ConditionalOnProperty(name = "itsu-token.web-register.enable", havingValue = "true", matchIfMissing = false)
+	public TokenListController tokenListController() {
+		return new TokenListController();
+	}
+
+	@Bean
+	@ConditionalOnProperty(name = "itsu-token.web-register.enable", havingValue = "true", matchIfMissing = false)
+	public TokenRegisterController tokenRegisterController() {
+		return new TokenRegisterController();
+	}
+
+	@Bean
+	public SpringUtil springUtil() {
+		return new SpringUtil();
+	}
+
+	@Bean
+	public WebMvcConfigurer tokenRegisterWebMvcConfigurer(ItsuTokenProperties properties) {
 		return new WebMvcConfigurer() {
 
 			@Override

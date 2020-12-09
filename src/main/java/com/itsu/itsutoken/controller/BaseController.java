@@ -2,26 +2,21 @@ package com.itsu.itsutoken.controller;
 
 import java.io.IOException;
 
-import com.itsu.itsutoken.configuration.ItsuTokenProperties;
-import com.itsu.itsutoken.util.ServletUtil;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+
+import com.itsu.itsutoken.configuration.ItsuTokenProperties;
+import com.itsu.itsutoken.util.ServletUtil;
 
 import cn.hutool.core.io.IoUtil;
 
-@RestController
-@ConditionalOnBean(value = ItsuTokenProperties.class)
-public class BaseController {
+public class BaseController extends SuperController {
 
-    @Autowired
+	@javax.annotation.Resource
     private ItsuTokenProperties properties;
 
     @RequestMapping("#{itsuTokenProperties.webRegister.registerUrl}")
