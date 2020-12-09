@@ -4,7 +4,7 @@
 itsu-token作为SpringBoot 的starter 模块依赖SpringBoot环境。使用了hu-tool工具包作为底层开发工具包。依赖Spring Aop进行token校验。支持token的持久化保存，目前仅支持mysql数据库。支持token的可视化构建和管理。token构建，token list页面使用bootstrap和jquery-confirm进行设计。实现了第三方系统调用时的token校验、token注册等功能
 
 #### 软件架构
-​Spring, SpringBoot, Jquery, Hutool, Spring Aop
+Spring, SpringBoot, Jquery, Hutool, Spring Aop
 
 
 #### 安装教程
@@ -22,33 +22,71 @@ itsu-token作为SpringBoot 的starter 模块依赖SpringBoot环境。使用了hu
 
 #### 使用说明
 
-1.  第一步需要导入maven依赖，在需要进行校验的接口上添加@Token(required=true)注解.
-2.  修改application.yml或application.properties配置文件，可参考下述配置详解。如下提供一个配置参考
+#####  一、快速上手
 
-```yml
-itsu-token:
-  enable: true
-  table-class: com.itsu.itsutoken.table.RSATableSample
-  type: RSA
-  web-register:
-    enable: true
-    # register-url: registerToken
-    token-list-url: /listToken 
-  system:
-    encrypt-base64: true
-  init:
-    auto-create-table: true
-    # schema-location: classpath:schema/simpleSchema.sql
-spring:
-  datasource:
-    url: jdbc:mysql://192.168.22.122:3306/local_db
-    username: root
-    password: password
-debug: true
-#    driver-class-name: com.mysql.jdbc.Driver
-```
-3.  默认提供了Simple & RSA 两种token校验模式，也支持自定义校验,需要继承com.itsu.itsutoken.checker.TokenChecker抽象类并实现check()方法,最后将这个类注入到IOC容器中。这里留的自由度比较大，使用者可以随意发挥。<br>
-目前，自定义TokenChecker暂不支持token可视化管理。
+1. 第一步需要导入maven依赖。
+
+   ```xml
+   <dependency>
+   	<groupId>com.itsu</groupId>
+   	<artifactId>itsu-token</artifactId>
+   	<version>1.0</version>
+   </dependency>
+   ```
+
+2.  在application.yml或application.properties中开启itsu-token功能
+
+    ```yml
+    itsu-token:
+      enable: true
+    ```
+
+3.  在Application启动入口添加itsu-token的包扫描，确保itsu-token的IOC组件能够顺利被Spring IOC容器加载
+
+    ```java
+    @SpringBootApplication
+    @ComponentScan(basePackages = { "com.itsu.itsutoken", "com.itsu.token.test" })
+    public class ItsuTokenTestApplication {
+    
+    	public static void main(String[] args) {
+    		SpringApplication.run(ItsuTokenTestApplication.class, args);
+    	}
+    }
+    
+    ```
+
+4.  在需要提供token校验的接口上添加@Token注解
+
+    ```java
+    @RestController
+    public class TestController {
+    	@Token
+    	@GetMapping("/index")
+    	public String idx() {
+    		return "index";
+    	}
+    }
+    ```
+
+#####  二、自动创建token数据库表
+
+ 1. 开启自动建表功能
+
+ 2. 提供自动建表schema.sql
+
+    ```yml
+    itsu-token:
+      enable: true
+      init:
+        auto-create-table: true
+        schema-location: classpath:example.sql
+    ```
+
+    需要留意的是，即使使用者不提供schema，itsu-token也内置了两种建表方案。他们分别是rsaSchema.sql和simpleSchema.sql，分别对应了系统内置的两种校验方式“RSA” & "SIMPLE"
+
+    ![QQBvD.png](https://b1.sbimg.org/file/chevereto-jia/2020/12/09/QQBvD.png)
+
+    通常情况下我建议直接使用内置的schema完成自动建表，如果使用者一定要使用自定义的schema建表，还需要开启custom-schema功能，并给出自定义的schema-location。
 
 #### 参与贡献
 
