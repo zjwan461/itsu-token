@@ -4,6 +4,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import javax.annotation.Resource;
+
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
@@ -11,12 +13,9 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCallback;
-import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import com.itsu.itsutoken.annotation.TableDesc;
@@ -26,22 +25,20 @@ import com.itsu.itsutoken.exception.TokenCheckException;
 import com.itsu.itsutoken.table.SimpleTableSample;
 import com.itsu.itsutoken.table.TableSample;
 import com.itsu.itsutoken.util.ClassUtil;
-import com.itsu.itsutoken.util.IocUtil;
 import com.itsu.itsutoken.util.ServletUtil;
 
 import cn.hutool.core.annotation.AnnotationUtil;
 import cn.hutool.core.codec.Base64;
+import cn.hutool.extra.spring.SpringUtil;
 
 @Aspect
-@Component
-@ConditionalOnProperty(name = "type", prefix = "itsu-token", havingValue = "SIMPLE", matchIfMissing = true)
 public class SimpleTokenChecker extends TokenChecker<SimpleTableSample> {
 	private static final Logger log = LoggerFactory.getLogger(SimpleTokenChecker.class);
 
-	@Autowired
+	@Resource
 	private JdbcTemplate jdbcTemplate;
 
-	@Autowired
+	@Resource
 	private ItsuTokenProperties properties;
 
 	@Pointcut("@annotation(com.itsu.itsutoken.annotation.Token)")
@@ -54,7 +51,7 @@ public class SimpleTokenChecker extends TokenChecker<SimpleTableSample> {
 
 	@Override
 	public void check(JoinPoint joinPoint) throws TokenCheckException {
-		TableSample tableSample = IocUtil.getBean(TableSample.class);
+		TableSample tableSample = SpringUtil.getBean(TableSample.class);
 		if (tableSample != null) {
 			if (log.isDebugEnabled()) {
 				log.debug("user set custom tableSample [" + tableSample.getClass().getName() + "]");
@@ -81,7 +78,7 @@ public class SimpleTokenChecker extends TokenChecker<SimpleTableSample> {
 		String tableName = AnnotationUtil.getAnnotationValue(tableSample.getClass(), TableDesc.class);
 		String simpleToken = null;
 		try {
-			simpleToken = ClassUtil.getSimpleTokenValue(SimpleTableSample.class);
+			simpleToken = ClassUtil.getSimpleTokenValue(tableSample.getClass());
 			if (StringUtils.isEmpty(simpleToken)) {
 				simpleToken = "token";
 			}
@@ -91,7 +88,7 @@ public class SimpleTokenChecker extends TokenChecker<SimpleTableSample> {
 
 		String sysName = null;
 		try {
-			sysName = ClassUtil.getSysValue(SimpleTableSample.class);
+			sysName = ClassUtil.getSysValue(tableSample.getClass());
 			if (StringUtils.isEmpty(sysName)) {
 				sysName = "sys_name";
 			}

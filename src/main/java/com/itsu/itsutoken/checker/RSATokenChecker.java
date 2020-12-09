@@ -6,18 +6,17 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.Resource;
+
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCallback;
-import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import com.itsu.itsutoken.annotation.TableDesc;
@@ -27,7 +26,6 @@ import com.itsu.itsutoken.exception.TokenCheckException;
 import com.itsu.itsutoken.table.RSATableSample;
 import com.itsu.itsutoken.table.TableSample;
 import com.itsu.itsutoken.util.ClassUtil;
-import com.itsu.itsutoken.util.IocUtil;
 import com.itsu.itsutoken.util.ServletUtil;
 
 import cn.hutool.core.annotation.AnnotationUtil;
@@ -35,17 +33,16 @@ import cn.hutool.core.codec.Base64;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.crypto.asymmetric.KeyType;
 import cn.hutool.crypto.asymmetric.RSA;
+import cn.hutool.extra.spring.SpringUtil;
 
 @Aspect
-@Component
-@ConditionalOnProperty(name = "type", prefix = "itsu-token", havingValue = "RSA", matchIfMissing = false)
 public class RSATokenChecker extends TokenChecker<RSATableSample> {
 	private static final Logger log = LoggerFactory.getLogger(RSATokenChecker.class);
 
-	@Autowired
+	@Resource
 	private JdbcTemplate jdbcTemplate;
 
-	@Autowired
+	@Resource
 	private ItsuTokenProperties properties;
 
 	public RSATokenChecker() {
@@ -67,7 +64,7 @@ public class RSATokenChecker extends TokenChecker<RSATableSample> {
 
 	@Override
 	public void check(JoinPoint joinPoint) throws TokenCheckException {
-		TableSample tableSample = IocUtil.getBean(TableSample.class);
+		TableSample tableSample = SpringUtil.getBean(TableSample.class);
 		if (tableSample != null) {
 			if (log.isDebugEnabled()) {
 				log.debug("user set custom tableSample [" + tableSample.getClass().getName() + "]");

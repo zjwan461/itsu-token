@@ -8,16 +8,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.itsu.itsutoken.annotation.TableDesc;
-import com.itsu.itsutoken.configuration.ItsuTokenProperties;
-import com.itsu.itsutoken.configuration.Type;
-import com.itsu.itsutoken.exception.TokenCheckException;
-import com.itsu.itsutoken.table.RSATableSample;
-import com.itsu.itsutoken.table.SimpleTableSample;
-import com.itsu.itsutoken.util.ClassUtil;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCallback;
@@ -26,19 +16,24 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+
+import com.itsu.itsutoken.annotation.TableDesc;
+import com.itsu.itsutoken.configuration.ItsuTokenProperties;
+import com.itsu.itsutoken.configuration.Type;
+import com.itsu.itsutoken.exception.TokenCheckException;
+import com.itsu.itsutoken.table.RSATableSample;
+import com.itsu.itsutoken.table.SimpleTableSample;
+import com.itsu.itsutoken.util.ClassUtil;
 
 import cn.hutool.core.annotation.AnnotationUtil;
 
-@RestController
 @RequestMapping("/tokenData")
-@ConditionalOnBean(value = ItsuTokenProperties.class)
-public class TokenListController {
+public class TokenListController extends SuperController {
 
-    @Autowired
+	@javax.annotation.Resource
     private JdbcTemplate jdbcTemplate;
 
-    @Autowired
+	@javax.annotation.Resource
     private ItsuTokenProperties properties;
 
     @GetMapping("/list")

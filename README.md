@@ -41,21 +41,7 @@ Spring, SpringBoot, Jquery, Hutool, Spring Aop
       enable: true
     ```
 
-3.  在Application启动入口添加itsu-token的包扫描，确保itsu-token的IOC组件能够顺利被Spring IOC容器加载
-
-    ```java
-    @SpringBootApplication
-    @ComponentScan(basePackages = { "com.itsu.itsutoken", "com.itsu.token.test" })
-    public class ItsuTokenTestApplication {
-    
-    	public static void main(String[] args) {
-    		SpringApplication.run(ItsuTokenTestApplication.class, args);
-    	}
-    }
-    
-    ```
-
-4.  在需要提供token校验的接口上添加@Token注解
+3.  在需要提供token校验的接口上添加@Token注解
 
     ```java
     @RestController
@@ -86,7 +72,51 @@ Spring, SpringBoot, Jquery, Hutool, Spring Aop
 
     ![QQBvD.png](https://b1.sbimg.org/file/chevereto-jia/2020/12/09/QQBvD.png)
 
-    通常情况下我建议直接使用内置的schema完成自动建表，如果使用者一定要使用自定义的schema建表，还需要开启custom-schema功能，并给出自定义的schema-location。
+    通常情况下我建议直接使用内置的schema完成自动建表，如果使用者一定要使用自定义的schema建表，还需要开启custom-schema功能，并给出自定义的schema-location。并且需要在IOC容器中注入TableSample接口的实现类。并且使用特定的“表结构修饰注解”给这个类打上标记，以适配使用者在自定义schema脚本建表的表接口。请看如下一个完整的使用案例。
+
+    我准备了一个example.sql作为自定义建表的schema文件
+
+    ```sql
+    CREATE TABLE IF NOT EXISTS sys_token (
+        id char(32) not null primary key,
+        name varchar(255) not null,
+        simple_token char(32) not null
+    );
+    ```
+
+    同时我也开启了auto-create-table和custom-schema功能，并给出了schema文件的所在位置。
+
+    ```yaml
+    itsu-token:
+      enable: true
+      init:
+        auto-create-table: true
+        schema-location: classpath:example.sql
+        custom-schema: true  #声明开启自定义schema功能
+      web-register:
+        enable: true
+    ```
+
+    此时我还需要自定义一个tableSample类，如下。使用TableDesc,TableId,SimpleToken,SysName这几个注解完成和自定义example.sql的表结构统一。另一种验证方式RSA和这种方式是一致的，只不过不再使用SimpleToken这个注解，取而代之的是PrivateKey, PublicKey这两个注解。用于表示RSA非对称加密中的“公钥”和“私钥”。
+
+    ```java
+    @TableDesc("sys_token")
+    public class MySimpleTableSample implements TableSample {
+    	@TableId
+    	private String id;
+        
+    	@SimpleToken("simple_token")
+    	private String token;
+    	
+    	@SysName("name")
+    	private String name;
+    	
+    }
+    ```
+
+#####  三、自定义Token验证规则
+
+​	待续。。。
 
 #### 参与贡献
 
