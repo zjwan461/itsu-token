@@ -17,6 +17,7 @@ import com.itsu.itsutoken.table.SimpleTableSample;
 import com.itsu.itsutoken.util.ClassUtil;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCallback;
@@ -31,6 +32,7 @@ import cn.hutool.core.annotation.AnnotationUtil;
 
 @RestController
 @RequestMapping("/tokenData")
+@ConditionalOnBean(value = ItsuTokenProperties.class)
 public class TokenListController {
 
     @Autowired

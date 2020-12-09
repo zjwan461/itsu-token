@@ -4,14 +4,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import com.itsu.itsutoken.annotation.TableDesc;
-import com.itsu.itsutoken.annotation.Token;
-import com.itsu.itsutoken.configuration.ItsuTokenProperties;
-import com.itsu.itsutoken.exception.TokenCheckException;
-import com.itsu.itsutoken.table.SimpleTableSample;
-import com.itsu.itsutoken.util.ClassUtil;
-import com.itsu.itsutoken.util.ServletUtil;
-
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
@@ -27,12 +19,20 @@ import org.springframework.jdbc.core.PreparedStatementCallback;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
+import com.itsu.itsutoken.annotation.TableDesc;
+import com.itsu.itsutoken.annotation.Token;
+import com.itsu.itsutoken.configuration.ItsuTokenProperties;
+import com.itsu.itsutoken.exception.TokenCheckException;
+import com.itsu.itsutoken.table.SimpleTableSample;
+import com.itsu.itsutoken.util.ClassUtil;
+import com.itsu.itsutoken.util.ServletUtil;
+
 import cn.hutool.core.annotation.AnnotationUtil;
 import cn.hutool.core.codec.Base64;
 
 @Aspect
 @Component
-@ConditionalOnProperty(name = "type", prefix = "itsu-token", havingValue = "SIMPLE", matchIfMissing = false)
+@ConditionalOnProperty(name = "type", prefix = "itsu-token", havingValue = "SIMPLE", matchIfMissing = true)
 public class SimpleTokenChecker extends TokenChecker<SimpleTableSample> {
     private static final Logger log = LoggerFactory.getLogger(SimpleTokenChecker.class);
 

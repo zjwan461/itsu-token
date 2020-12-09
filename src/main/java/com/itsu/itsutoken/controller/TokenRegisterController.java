@@ -16,6 +16,7 @@ import com.itsu.itsutoken.table.SimpleTableSample;
 import com.itsu.itsutoken.util.ClassUtil;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -33,6 +34,7 @@ import cn.hutool.crypto.asymmetric.RSA;
 @RestController
 @RequestMapping("/tokenRegister")
 @ConditionalOnProperty(name = "itsu-token.web-register.enable", havingValue = "true", matchIfMissing = false)
+@ConditionalOnBean(value = ItsuTokenProperties.class)
 public class TokenRegisterController {
 
     @Autowired

@@ -32,109 +32,109 @@ import cn.hutool.extra.spring.SpringUtil;
 
 @Configuration
 @ConditionalOnClass({ TokenChecker.class, DataSourceAutoConfiguration.class })
-@ConditionalOnProperty(name = "itsu-token.enable", havingValue = "true", matchIfMissing = true)
+@ConditionalOnProperty(name = "itsu-token.enable", havingValue = "true", matchIfMissing = false)
 @EnableConfigurationProperties({ ItsuTokenProperties.class })
 @EnableAspectJAutoProxy(proxyTargetClass = true)
 public class ItsuTokenAutoConfiguration {
 
-    private final ItsuTokenProperties properties;
+	private final ItsuTokenProperties properties;
 
-    public ItsuTokenAutoConfiguration(ItsuTokenProperties properties) {
-        this.properties = properties;
-    }
+	public ItsuTokenAutoConfiguration(ItsuTokenProperties properties) {
+		this.properties = properties;
+	}
 
-    @Bean
-    @Primary
-    @ConditionalOnMissingBean(name = "itsuTokenProperties")
-    public ItsuTokenProperties itsuTokenProperties() {
-        return this.properties;
-    }
+	@Bean
+	@Primary
+	@ConditionalOnMissingBean(name = "itsuTokenProperties")
+	public ItsuTokenProperties itsuTokenProperties() {
+		return this.properties;
+	}
 
-    @Bean
-    @ConditionalOnMissingBean(TokenChecker.class)
-    public TokenChecker<? extends TableSample> tokenChecker() throws TokenConfigureException {
-        TokenChecker<? extends TableSample> tokenChecker = null;
-        Type type = properties.getType();
-        if (type == Type.CUSTOM) {
-            TokenCheckerGenerater tokenCheckerGenerater = SpringUtil.getBean(TokenCheckerGenerater.class);
-            if (tokenCheckerGenerater == null) {
-                throw new TokenConfigureException(
-                        "You must create a bean implements TokenCheckerGenerater and aware into IOC because of the token type is CUSTOM");
-            }
-            tokenChecker = tokenCheckerGenerater.generateTokenChecker();
-        } else {
-            throw new TokenConfigureException(
-                    " itsu-token.type must be RSA / SIMPLE / CUSTOM, myabe you are not use component scan com.itsu.itsutoken pacakge ");
-            // tokenChecker = type.generateTokenChecker();
-        }
+	@Bean
+	@ConditionalOnMissingBean(TokenChecker.class)
+	public TokenChecker<? extends TableSample> tokenChecker() throws TokenConfigureException {
+		TokenChecker<? extends TableSample> tokenChecker = null;
+		Type type = properties.getType();
+		if (type == Type.CUSTOM) {
+			TokenCheckerGenerater tokenCheckerGenerater = SpringUtil.getBean(TokenCheckerGenerater.class);
+			if (tokenCheckerGenerater == null) {
+				throw new TokenConfigureException(
+						"You must create a bean implements TokenCheckerGenerater and aware into IOC because of the token type is CUSTOM");
+			}
+			tokenChecker = tokenCheckerGenerater.generateTokenChecker();
+		} else {
+			throw new TokenConfigureException("As your configuration, the itsu-token.type=" + type.name()
+					+ ", but cant not found a implement in IOC container. Maybe you are not use component scan com.itsu.itsutoken pacakge ");
+//             tokenChecker = type.generateTokenChecker();
+		}
 
-        // tokenChecker.setJdbcTemplate(jdbcTemplate);
-        // tokenChecker.setProperties(properties);
+		// tokenChecker.setJdbcTemplate(jdbcTemplate);
+		// tokenChecker.setProperties(properties);
 
-        return tokenChecker;
-    }
+		return tokenChecker;
+	}
 
-    @Bean
-    public DataSourceInitializer dataSourceInitializer(DataSource dataSource,
-            DataSourceProperties dataSourceProperties) {
-        DataSourceInitializer dataSourceInitializer = new DataSourceInitializer(dataSource, dataSourceProperties);
-        if (properties.getInit().isAutoCreateTable()) {
-            // 如果spring jdbc的schema sql脚本为null，则执行itsu-token中设置的schema脚本
-            if (CollectionUtil.isEmpty(dataSourceProperties.getSchema())) {
-                String schemaLocation = properties.getInit().getSchemaLocation();
-                dataSourceProperties.setSchema(Arrays.asList(schemaLocation));
-            }
-            dataSourceInitializer.createSchema();
-        }
-        return dataSourceInitializer;
-    }
+	@Bean
+	public DataSourceInitializer dataSourceInitializer(DataSource dataSource,
+			DataSourceProperties dataSourceProperties) {
+		DataSourceInitializer dataSourceInitializer = new DataSourceInitializer(dataSource, dataSourceProperties);
+		if (properties.getInit().isAutoCreateTable()) {
+			// 如果spring jdbc的schema sql脚本为null，则执行itsu-token中设置的schema脚本
+			if (CollectionUtil.isEmpty(dataSourceProperties.getSchema())) {
+				String schemaLocation = properties.getInit().getSchemaLocation();
+				dataSourceProperties.setSchema(Arrays.asList(schemaLocation));
+			}
+			dataSourceInitializer.createSchema();
+		}
+		return dataSourceInitializer;
+	}
 
-    @Bean
-    public WebMvcConfigurer tokenRegisterWebMvcConfigurer() {
-        return new WebMvcConfigurer() {
+	@Bean
+	public WebMvcConfigurer tokenRegisterWebMvcConfigurer() {
+		return new WebMvcConfigurer() {
 
-            @Override
-            public void addInterceptors(InterceptorRegistry registry) {
-                String registerUrl = properties.getWebRegister().getRegisterUrl();
-                String tokenListUrl = properties.getWebRegister().getTokenListUrl();
-                if (!StrUtil.startWith(registerUrl, "/")) {
-                    registerUrl += "/" + registerUrl;
-                }
-                if (!StrUtil.startWith(tokenListUrl, "/")) {
-                    tokenListUrl += "/" + tokenListUrl;
-                }
-                final String registerUrlStr = registerUrl;
-                final String tokenListUrlStr = tokenListUrl;
-                registry.addInterceptor(new HandlerInterceptor() {
+			@Override
+			public void addInterceptors(InterceptorRegistry registry) {
+				String registerUrl = properties.getWebRegister().getRegisterUrl();
+				String tokenListUrl = properties.getWebRegister().getTokenListUrl();
+				if (!StrUtil.startWith(registerUrl, "/")) {
+					registerUrl += "/" + registerUrl;
+				}
+				if (!StrUtil.startWith(tokenListUrl, "/")) {
+					tokenListUrl += "/" + tokenListUrl;
+				}
+				final String registerUrlStr = registerUrl;
+				final String tokenListUrlStr = tokenListUrl;
+				registry.addInterceptor(new HandlerInterceptor() {
 
-                    @Override
-                    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
-                            throws Exception {
+					@Override
+					public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
+							throws Exception {
 
-                        if (properties.getWebRegister().isEnable()) {
-                            if (ServletUtil.isLogin()) {
-                                return true;
-                            } else {
-                                response.getWriter().write("Authorization error");
-                                response.setStatus(401);
-                                response.sendRedirect("login.html");
-                                return false;
-                            }
-                        } else {
-                            response.getWriter().write("itsu-token.web-register is not set to true");
-                            return false;
-                        }
+						if (properties.getWebRegister().isEnable()) {
+							if (ServletUtil.isLogin()) {
+								return true;
+							} else {
+								response.getWriter().write("Authorization error");
+								response.setStatus(401);
+								response.sendRedirect("login.html");
+								return false;
+							}
+						} else {
+							response.getWriter().write("itsu-token.web-register is not set to true");
+							return false;
+						}
 
-                    }
-                }).addPathPatterns(registerUrlStr, tokenListUrlStr).addPathPatterns(Constants.LOGIN_IN_URLS);
-            }
+					}
+				}).addPathPatterns(registerUrlStr, tokenListUrlStr).addPathPatterns(Constants.LOGIN_IN_URLS);
+			}
 
-        };
-    }
+		};
+	}
 
-    public static class Constants {
-        public static final List<String> LOGIN_IN_URLS = Arrays.asList("/tokenListUrl", "/tokenRegisterUrl",
-                "/tokenData/**", "/tokenRegister/**");
-    }
+	public static class Constants {
+		public static final List<String> LOGIN_IN_URLS = Arrays.asList("/tokenListUrl", "/tokenRegisterUrl",
+				"/tokenData/**", "/tokenRegister/**");
+	}
 
 }

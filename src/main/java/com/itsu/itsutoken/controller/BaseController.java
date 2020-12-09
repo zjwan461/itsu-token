@@ -6,6 +6,7 @@ import com.itsu.itsutoken.configuration.ItsuTokenProperties;
 import com.itsu.itsutoken.util.ServletUtil;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import cn.hutool.core.io.IoUtil;
 
 @RestController
+@ConditionalOnBean(value = ItsuTokenProperties.class)
 public class BaseController {
 
     @Autowired
