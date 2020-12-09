@@ -25,7 +25,9 @@ import com.itsu.itsutoken.annotation.Token;
 import com.itsu.itsutoken.configuration.ItsuTokenProperties;
 import com.itsu.itsutoken.exception.TokenCheckException;
 import com.itsu.itsutoken.table.RSATableSample;
+import com.itsu.itsutoken.table.TableSample;
 import com.itsu.itsutoken.util.ClassUtil;
+import com.itsu.itsutoken.util.IocUtil;
 import com.itsu.itsutoken.util.ServletUtil;
 
 import cn.hutool.core.annotation.AnnotationUtil;
@@ -65,7 +67,24 @@ public class RSATokenChecker extends TokenChecker<RSATableSample> {
 
 	@Override
 	public void check(JoinPoint joinPoint) throws TokenCheckException {
-		RSATableSample tableSample = this.getTableSample();
+		TableSample tableSample = IocUtil.getBean(TableSample.class);
+		if (tableSample != null) {
+			if (log.isDebugEnabled()) {
+				log.debug("user set custom tableSample [" + tableSample.getClass().getName() + "]");
+			}
+			if (tableSample.getClass().isInterface()) {
+				throw new TokenCheckException(
+						"if you set custom-schema to true you need provide a tableSample Class which implements com.itsu.itsutoken.table.TableSample and inject into Spring application context");
+			}
+		} else {
+			tableSample = this.getTableSample();
+			if (log.isDebugEnabled()) {
+				log.debug("user do not set set custom tableSample, will use default ["
+						+ tableSample.getClass().getName() + "]");
+			}
+		}
+
+		tableSample = this.getTableSample();
 		String tableName = AnnotationUtil.getAnnotationValue(tableSample.getClass(), TableDesc.class);
 
 		String privateKeyName = null;

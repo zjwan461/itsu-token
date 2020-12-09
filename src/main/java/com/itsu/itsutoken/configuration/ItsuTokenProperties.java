@@ -75,6 +75,7 @@ public class ItsuTokenProperties {
 	public static class Init {
 		private boolean autoCreateTable = false;
 		private String schemaLocation;
+		private boolean customSchema = false;
 
 		public boolean isAutoCreateTable() {
 			return autoCreateTable;
@@ -99,6 +100,14 @@ public class ItsuTokenProperties {
 
 		public void setSchemaLocation(String schemaLocation) {
 			this.schemaLocation = schemaLocation;
+		}
+
+		public boolean isCustomSchema() {
+			return customSchema;
+		}
+
+		public void setCustomSchema(boolean customSchema) {
+			this.customSchema = customSchema;
 		}
 
 	}

@@ -7,11 +7,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 
-import com.itsu.itsutoken.checker.TokenChecker;
-import com.itsu.itsutoken.exception.TokenConfigureException;
-import com.itsu.itsutoken.table.TableSample;
-import com.itsu.itsutoken.util.ServletUtil;
-
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -26,9 +21,15 @@ import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import com.itsu.itsutoken.checker.TokenChecker;
+import com.itsu.itsutoken.exception.TokenConfigureException;
+import com.itsu.itsutoken.table.TableSample;
+import com.itsu.itsutoken.table.TableSampleAdaptor;
+import com.itsu.itsutoken.util.IocUtil;
+import com.itsu.itsutoken.util.ServletUtil;
+
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.extra.spring.SpringUtil;
 
 @Configuration
 @ConditionalOnClass({ TokenChecker.class, DataSourceAutoConfiguration.class })
@@ -56,7 +57,7 @@ public class ItsuTokenAutoConfiguration {
 		TokenChecker<? extends TableSample> tokenChecker = null;
 		Type type = properties.getType();
 		if (type == Type.CUSTOM) {
-			TokenCheckerGenerater tokenCheckerGenerater = SpringUtil.getBean(TokenCheckerGenerater.class);
+			TokenCheckerGenerater tokenCheckerGenerater = IocUtil.getBean(TokenCheckerGenerater.class);
 			if (tokenCheckerGenerater == null) {
 				throw new TokenConfigureException(
 						"You must create a bean implements TokenCheckerGenerater and aware into IOC because of the token type is CUSTOM");
@@ -65,13 +66,16 @@ public class ItsuTokenAutoConfiguration {
 		} else {
 			throw new TokenConfigureException("As your configuration, the itsu-token.type=" + type.name()
 					+ ", but cant not found a implement in IOC container. Maybe you are not use component scan com.itsu.itsutoken pacakge ");
-//             tokenChecker = type.generateTokenChecker();
 		}
 
-		// tokenChecker.setJdbcTemplate(jdbcTemplate);
-		// tokenChecker.setProperties(properties);
-
 		return tokenChecker;
+	}
+
+	@Bean
+	@ConditionalOnProperty(prefix = "itsu-token.init", name = "custom-schema", havingValue = "true", matchIfMissing = false)
+	@ConditionalOnMissingBean(value = TableSample.class)
+	public TableSample tableSample() {
+		return new TableSampleAdaptor();
 	}
 
 	@Bean
