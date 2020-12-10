@@ -11,7 +11,6 @@ import javax.annotation.Resource;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
-import org.aspectj.lang.annotation.Pointcut;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
@@ -48,10 +47,6 @@ public class RSATokenChecker extends TokenChecker<RSATableSample> {
 
 	public RSATokenChecker() {
 		this.setTableSample(new RSATableSample());
-	}
-
-	@Pointcut("@annotation(com.itsu.itsutoken.annotation.Token)")
-	public void rule() {
 	}
 
 	@Before("rule()&&@annotation(tokenAnno)")

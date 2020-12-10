@@ -1,21 +1,22 @@
 package com.itsu.itsutoken.checker;
 
-import com.itsu.itsutoken.exception.TokenCheckException;
+import org.aspectj.lang.annotation.Pointcut;
+
 import com.itsu.itsutoken.table.TableSample;
 
-import org.aspectj.lang.JoinPoint;
+public abstract class TokenChecker<T extends TableSample> implements Checker {
 
-public abstract class TokenChecker<T extends TableSample> {
+	protected T tableSample;
 
-    protected T tableSample;
+	public T getTableSample() {
+		return tableSample;
+	}
 
-    public abstract void check(JoinPoint joinPoint) throws TokenCheckException;
+	public void setTableSample(T tableSample) {
+		this.tableSample = tableSample;
+	}
 
-    public T getTableSample() {
-        return tableSample;
-    }
-
-    public void setTableSample(T tableSample) {
-        this.tableSample = tableSample;
-    }
+	@Pointcut("@annotation(com.itsu.itsutoken.annotation.Token)")
+	public void rule() {
+	}
 }

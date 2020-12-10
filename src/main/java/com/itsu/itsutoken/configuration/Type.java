@@ -1,5 +1,6 @@
 package com.itsu.itsutoken.configuration;
 
+import com.itsu.itsutoken.checker.CustomTokenChecker;
 import com.itsu.itsutoken.checker.RSATokenChecker;
 import com.itsu.itsutoken.checker.SimpleTokenChecker;
 import com.itsu.itsutoken.checker.TokenChecker;
@@ -21,7 +22,7 @@ public enum Type implements TokenCheckerGenerater {
     CUSTOM {
         @Override
         public TokenChecker<? extends TableSample> generateTokenChecker() {
-            return null;
+            return new CustomTokenChecker();
         }
 
     };

@@ -6,6 +6,9 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCallback;
@@ -21,14 +24,17 @@ import com.itsu.itsutoken.domain.IdType;
 import com.itsu.itsutoken.exception.TokenCheckException;
 import com.itsu.itsutoken.table.RSATableSample;
 import com.itsu.itsutoken.table.SimpleTableSample;
+import com.itsu.itsutoken.table.TableSample;
 import com.itsu.itsutoken.util.ClassUtil;
 
 import cn.hutool.core.annotation.AnnotationUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.crypto.asymmetric.RSA;
+import cn.hutool.extra.spring.SpringUtil;
 
 @RequestMapping("/tokenRegister")
 public class TokenRegisterController extends SuperController {
+	private static final Logger log = LoggerFactory.getLogger(TokenRegisterController.class);
 
 	@javax.annotation.Resource
 	private JdbcTemplate jdbcTemplate;
@@ -43,13 +49,38 @@ public class TokenRegisterController extends SuperController {
 		String sysName = "sys_name";
 		String id = "id";
 		IdType idType = IdType.FAST_SIMPLE_UUID;
+		Class<? extends TableSample> tableSampleClass = null;
+		try {
+			TableSample tableSample = SpringUtil.getBean(TableSample.class);
+			if (log.isDebugEnabled()) {
+				log.debug("user set custom tableSample [" + tableSample.getClass().getName() + "]");
+			}
+
+			try {
+				Integer value = (Integer) tableSample.getClass().getMethod("tip").invoke(tableSample);
+				if (value != 0) {
+					throw new TokenCheckException(
+							"if you set custom-schema to true you need provide a tableSample Class which implements com.itsu.itsutoken.table.TableSample and inject into Spring application context");
+				}
+				tableSampleClass = tableSample.getClass();
+			} catch (Exception e) {
+				throw new TokenCheckException(e);
+			}
+		} catch (NoSuchBeanDefinitionException e) {
+			if (log.isDebugEnabled()) {
+				log.debug("user do not set set custom tableSample, will use default");
+			}
+		}
+		
 		if (properties.getType() == Type.SIMPLE) {
-			tableName = AnnotationUtil.getAnnotationValue(SimpleTableSample.class, TableDesc.class);
-			sysName = ClassUtil.getSysValue(SimpleTableSample.class);
-			id = ClassUtil.getId(SimpleTableSample.class);
-			idType = ClassUtil.getIdStrategy(SimpleTableSample.class);
+			if (tableSampleClass == null)
+				tableSampleClass = SimpleTableSample.class;
+			tableName = AnnotationUtil.getAnnotationValue(tableSampleClass, TableDesc.class);
+			sysName = ClassUtil.getSysValue(tableSampleClass);
+			id = ClassUtil.getId(tableSampleClass);
+			idType = ClassUtil.getIdStrategy(tableSampleClass);
 			if (this.checkSystem(sysName, system, tableName)) {
-				String token = ClassUtil.getSimpleTokenValue(SimpleTableSample.class);
+				String token = ClassUtil.getSimpleTokenValue(tableSampleClass);
 				String generateToken = IdUtil.fastSimpleUUID();
 				jdbcTemplate.update(
 						"insert into " + tableName + " ( " + id + "," + sysName + "," + token + ") value (?,?,?)",
@@ -60,13 +91,15 @@ public class TokenRegisterController extends SuperController {
 				map.put("errorMsg", "Duplicate system name");
 			}
 		} else if (properties.getType() == Type.RSA) {
-			tableName = AnnotationUtil.getAnnotationValue(RSATableSample.class, TableDesc.class);
-			sysName = ClassUtil.getSysValue(RSATableSample.class);
-			id = ClassUtil.getId(RSATableSample.class);
-			idType = ClassUtil.getIdStrategy(RSATableSample.class);
+			if (tableSampleClass == null)
+				tableSampleClass = RSATableSample.class;
+			tableName = AnnotationUtil.getAnnotationValue(tableSampleClass, TableDesc.class);
+			sysName = ClassUtil.getSysValue(tableSampleClass);
+			id = ClassUtil.getId(tableSampleClass);
+			idType = ClassUtil.getIdStrategy(tableSampleClass);
 			if (this.checkSystem(sysName, system, tableName)) {
-				String privateKey = ClassUtil.getPrivateKeyValue(RSATableSample.class);
-				String publicKey = ClassUtil.getPublicKeyValue(RSATableSample.class);
+				String privateKey = ClassUtil.getPrivateKeyValue(tableSampleClass);
+				String publicKey = ClassUtil.getPublicKeyValue(tableSampleClass);
 				final RSA rsa = new RSA();
 				String generatePrivateKey = rsa.getPrivateKeyBase64();
 				String generatePublicKey = rsa.getPublicKeyBase64();

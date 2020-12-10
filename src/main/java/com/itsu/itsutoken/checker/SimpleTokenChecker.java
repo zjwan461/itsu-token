@@ -9,7 +9,6 @@ import javax.annotation.Resource;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
-import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,10 +40,6 @@ public class SimpleTokenChecker extends TokenChecker<SimpleTableSample> {
 
 	@Resource
 	private ItsuTokenProperties properties;
-
-	@Pointcut("@annotation(com.itsu.itsutoken.annotation.Token)")
-	public void rule() {
-	}
 
 	public SimpleTokenChecker() {
 		this.setTableSample(new SimpleTableSample());

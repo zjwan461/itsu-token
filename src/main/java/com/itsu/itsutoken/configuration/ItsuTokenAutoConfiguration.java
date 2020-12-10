@@ -7,7 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 
-import org.springframework.beans.factory.NoSuchBeanDefinitionException;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -15,12 +15,13 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import com.itsu.itsutoken.checker.CusTokenChecker;
+import com.itsu.itsutoken.checker.CustomTokenChecker;
 import com.itsu.itsutoken.checker.RSATokenChecker;
 import com.itsu.itsutoken.checker.SimpleTokenChecker;
 import com.itsu.itsutoken.checker.TokenChecker;
@@ -49,32 +50,33 @@ public class ItsuTokenAutoConfiguration {
 
 	@Bean
 	@ConditionalOnProperty(name = "type", prefix = "itsu-token", havingValue = "CUSTOM", matchIfMissing = false)
-	@DependsOn("springUtil")
-	public TokenChecker<? extends TableSample> tokenChecker(ItsuTokenProperties properties)
+	@ConditionalOnBean(CusTokenChecker.class)
+	public CustomTokenChecker customTokenChecker(ItsuTokenProperties properties, CusTokenChecker checker)
 			throws TokenConfigureException {
 
-		TokenCheckerGenerater tokenCheckerGenerater = null;
-		try {
-			tokenCheckerGenerater = SpringUtil.getBean(TokenCheckerGenerater.class);
-		} catch (NoSuchBeanDefinitionException e) {
-			throw new TokenConfigureException(
-					"You must create a bean implements TokenCheckerGenerater and aware into IOC because of the token type is CUSTOM",
-					e);
-		}
-		TokenChecker<? extends TableSample> tokenChecker = tokenCheckerGenerater.generateTokenChecker();
-		return tokenChecker;
+//		CusTokenChecker checker = null;
+//		try {
+//			checker = SpringUtil.getBean(CusTokenChecker.class);
+//		} catch (NoSuchBeanDefinitionException e) {
+//			throw new TokenConfigureException(
+//					"You must create a bean implements TokenChecker and aware into IOC because of the token type is CUSTOM",
+//					e);
+//		}
+		CustomTokenChecker customTokenChecker = (CustomTokenChecker) Type.CUSTOM.generateTokenChecker();
+		customTokenChecker.setChecker(checker);
+		return customTokenChecker;
 	}
 
 	@Bean
 	@ConditionalOnProperty(name = "type", prefix = "itsu-token", havingValue = "SIMPLE", matchIfMissing = true)
 	public SimpleTokenChecker simpleTokenChecker() {
-		return new SimpleTokenChecker();
+		return (SimpleTokenChecker) Type.SIMPLE.generateTokenChecker();
 	}
 
 	@Bean
 	@ConditionalOnProperty(name = "type", prefix = "itsu-token", havingValue = "RSA", matchIfMissing = false)
 	public RSATokenChecker RSATokenChecker() {
-		return new RSATokenChecker();
+		return (RSATokenChecker) Type.RSA.generateTokenChecker();
 	}
 
 	@Bean
