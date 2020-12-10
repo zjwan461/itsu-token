@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -14,6 +15,7 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
@@ -47,13 +49,17 @@ public class ItsuTokenAutoConfiguration {
 
 	@Bean
 	@ConditionalOnProperty(name = "type", prefix = "itsu-token", havingValue = "CUSTOM", matchIfMissing = false)
+	@DependsOn("springUtil")
 	public TokenChecker<? extends TableSample> tokenChecker(ItsuTokenProperties properties)
 			throws TokenConfigureException {
 
-		TokenCheckerGenerater tokenCheckerGenerater = SpringUtil.getBean(TokenCheckerGenerater.class);
-		if (tokenCheckerGenerater == null) {
+		TokenCheckerGenerater tokenCheckerGenerater = null;
+		try {
+			tokenCheckerGenerater = SpringUtil.getBean(TokenCheckerGenerater.class);
+		} catch (NoSuchBeanDefinitionException e) {
 			throw new TokenConfigureException(
-					"You must create a bean implements TokenCheckerGenerater and aware into IOC because of the token type is CUSTOM");
+					"You must create a bean implements TokenCheckerGenerater and aware into IOC because of the token type is CUSTOM",
+					e);
 		}
 		TokenChecker<? extends TableSample> tokenChecker = tokenCheckerGenerater.generateTokenChecker();
 		return tokenChecker;

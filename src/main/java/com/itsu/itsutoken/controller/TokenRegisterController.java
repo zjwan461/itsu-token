@@ -80,8 +80,10 @@ public class TokenRegisterController extends SuperController {
 			} else {
 				map.put("errorMsg", "Duplicate system name");
 			}
+		} else if (properties.getType() == Type.CUSTOM) {
+			throw new TokenCheckException("Sorry, do not support CUSTOM Type in webregister");
 		} else {
-			throw new TokenCheckException("Unknown Type");
+			throw new TokenCheckException("Unsupported Type [ " + properties.getType().name() + " ]");
 		}
 
 		return map;
