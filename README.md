@@ -22,6 +22,8 @@ Spring, SpringBoot, Jquery, Hutool, Spring Aop
 
 #### 使用说明
 
+**使用者可以在<a href="https://github.com/zjwan461/itsu-token-sample/">itsu-token-sample</a>中查看到具体的使用案例**
+
 #####  一、快速上手
 
 1. 第一步需要导入maven依赖。
@@ -70,7 +72,7 @@ Spring, SpringBoot, Jquery, Hutool, Spring Aop
 
     需要留意的是，即使使用者不提供schema，itsu-token也内置了两种建表方案。他们分别是rsaSchema.sql和simpleSchema.sql，分别对应了系统内置的两种校验方式“RSA” & "SIMPLE"
 
-    ![QQBvD.png](https://b1.sbimg.org/file/chevereto-jia/2020/12/09/QQBvD.png)
+    ![QA2JR.png](https://b1.sbimg.org/file/chevereto-jia/2020/12/10/QA2JR.png)
 
     通常情况下我建议直接使用内置的schema完成自动建表，如果使用者一定要使用自定义的schema建表，还需要开启custom-schema功能，并给出自定义的schema-location。并且需要在IOC容器中注入TableSample接口的实现类。并且使用特定的“表结构修饰注解”给这个类打上标记，以适配使用者在自定义schema脚本建表的表接口。请看如下一个完整的使用案例。
 
