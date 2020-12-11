@@ -184,5 +184,25 @@ Spring, SpringBoot, Jquery, Hutool, Spring Aop
 
 #####  四、web register 功能
 
-​	做开发的都不太愿意写文档，所以待续吧，等我整理一下...
+​	目前itsu-token仅对默认支持的Token校验类型“simple”，”rsa“ 提供了web register功能。至于web register，顾名思义就是提供了集成化的非侵入式的通过web方式来向系统注册token的功能。在itsu-token中，这一功能，默认是关闭的。需要在配置文件中开启。如下是一个web-register功能的完整配置。可以看到的是除了web register的开关位，还提供了几个选项。详细的解释可以参考下文的定义。<font color='red'>需要注意的是，web register目前暂时不支持自定义校验，也就是custom token check。</font>
+
+```yaml
+itsu-token:
+  web-register:
+    enable: true
+    user: admin
+    password: password
+    register-url: /register.html
+    token-list-url: /tokenlist.html
+```
+
+​	当你开启web register后，想要访问到tokenlist.html, 此时itsu-token会要求你先进行登录。账号和密码也就是在上述代码中所配置的。
+
+![QB2rA.png](https://b1.sbimg.org/file/chevereto-jia/2020/12/11/QB2rA.png)
+
+当你完成登录后，就能访问register.html和tokenlist.html了。你可以在register页面做token的注册工作，在tokenlist.html查看已注册的token列表。
+
+![QB0wY.png](https://b1.sbimg.org/file/chevereto-jia/2020/12/11/QB0wY.png)
+
+![QBkG4.png](https://b1.sbimg.org/file/chevereto-jia/2020/12/11/QBkG4.png)
 
