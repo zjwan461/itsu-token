@@ -9,10 +9,10 @@ import javax.annotation.Resource;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
-import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCallback;
@@ -41,18 +41,15 @@ public class SimpleTokenChecker extends TokenChecker<SimpleTableSample> {
 	@Resource
 	private ItsuTokenProperties properties;
 
-	@Pointcut("@annotation(com.itsu.itsutoken.annotation.Token)")
-	public void rule() {
-	}
-
 	public SimpleTokenChecker() {
 		this.setTableSample(new SimpleTableSample());
 	}
 
 	@Override
 	public void check(JoinPoint joinPoint) throws TokenCheckException {
-		TableSample tableSample = SpringUtil.getBean(TableSample.class);
-		if (tableSample != null) {
+		TableSample tableSample = null;
+		try {
+			tableSample = SpringUtil.getBean(TableSample.class);
 			if (log.isDebugEnabled()) {
 				log.debug("user set custom tableSample [" + tableSample.getClass().getName() + "]");
 			}
@@ -66,8 +63,7 @@ public class SimpleTokenChecker extends TokenChecker<SimpleTableSample> {
 			} catch (Exception e) {
 				throw new TokenCheckException(e);
 			}
-
-		} else {
+		} catch (NoSuchBeanDefinitionException e) {
 			tableSample = this.getTableSample();
 			if (log.isDebugEnabled()) {
 				log.debug("user do not set set custom tableSample, will use default ["

@@ -102,6 +102,8 @@
                             $("#sik").addClass("sr-only")
                             $("#prk").removeClass("sr-only")
                             $("#puk").removeClass("sr-only")
+                        } else if (data.type == 'custom') {
+                        	$.alert("暂不支持custom type的web register")
                         }
                         $(".container").css("display", "")
                     } else {

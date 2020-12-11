@@ -11,9 +11,9 @@ import javax.annotation.Resource;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
-import org.aspectj.lang.annotation.Pointcut;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCallback;
@@ -49,10 +49,6 @@ public class RSATokenChecker extends TokenChecker<RSATableSample> {
 		this.setTableSample(new RSATableSample());
 	}
 
-	@Pointcut("@annotation(com.itsu.itsutoken.annotation.Token)")
-	public void rule() {
-	}
-
 	@Before("rule()&&@annotation(tokenAnno)")
 	public void before(JoinPoint joinPoint, Token tokenAnno) throws TokenCheckException {
 		if (tokenAnno.requried()) {
@@ -64,16 +60,23 @@ public class RSATokenChecker extends TokenChecker<RSATableSample> {
 
 	@Override
 	public void check(JoinPoint joinPoint) throws TokenCheckException {
-		TableSample tableSample = SpringUtil.getBean(TableSample.class);
-		if (tableSample != null) {
+		TableSample tableSample = null;
+		try {
+			tableSample = SpringUtil.getBean(TableSample.class);
 			if (log.isDebugEnabled()) {
 				log.debug("user set custom tableSample [" + tableSample.getClass().getName() + "]");
 			}
-			if (tableSample.getClass().isInterface()) {
-				throw new TokenCheckException(
-						"if you set custom-schema to true you need provide a tableSample Class which implements com.itsu.itsutoken.table.TableSample and inject into Spring application context");
+
+			try {
+				Integer value = (Integer) tableSample.getClass().getMethod("tip").invoke(tableSample);
+				if (value != 0) {
+					throw new TokenCheckException(
+							"if you set custom-schema to true you need provide a tableSample Class which implements com.itsu.itsutoken.table.TableSample and inject into Spring application context");
+				}
+			} catch (Exception e) {
+				throw new TokenCheckException(e);
 			}
-		} else {
+		} catch (NoSuchBeanDefinitionException e) {
 			tableSample = this.getTableSample();
 			if (log.isDebugEnabled()) {
 				log.debug("user do not set set custom tableSample, will use default ["
@@ -81,9 +84,7 @@ public class RSATokenChecker extends TokenChecker<RSATableSample> {
 			}
 		}
 
-		tableSample = this.getTableSample();
 		String tableName = AnnotationUtil.getAnnotationValue(tableSample.getClass(), TableDesc.class);
-
 		String privateKeyName = null;
 		try {
 			privateKeyName = ClassUtil.getPrivateKeyValue(tableSample.getClass());
@@ -143,7 +144,7 @@ public class RSATokenChecker extends TokenChecker<RSATableSample> {
 				});
 
 		if (CollectionUtil.isEmpty(rsaList)) {
-			throw new TokenCheckException("can not found any system " + system + " in current system");
+			throw new TokenCheckException("can not found any system " + system + " in current database");
 		}
 
 		boolean result = false;
