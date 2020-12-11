@@ -12,6 +12,7 @@ Spring, SpringBoot, Jquery, Hutool, Spring Aop
 1.  git clone https://github.com/zjwan461/itsu-token.git
 2.  mvn clean install
 3.  在需要使用的项目中添加新构建的maven依赖
+
 ```xml
 <dependency>
     <groupId>com.itsu</groupId>
