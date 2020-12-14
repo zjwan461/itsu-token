@@ -132,6 +132,7 @@ public class ItsuTokenAutoConfiguration {
 			public void addInterceptors(InterceptorRegistry registry) {
 				String registerUrl = properties.getWebRegister().getRegisterUrl();
 				String tokenListUrl = properties.getWebRegister().getTokenListUrl();
+				String type = properties.getType().name();
 				if (!StrUtil.startWith(registerUrl, "/")) {
 					registerUrl += "/" + registerUrl;
 				}
@@ -140,6 +141,7 @@ public class ItsuTokenAutoConfiguration {
 				}
 				final String registerUrlStr = registerUrl;
 				final String tokenListUrlStr = tokenListUrl;
+				final String typeStr = type;
 				registry.addInterceptor(new HandlerInterceptor() {
 
 					@Override
@@ -147,6 +149,12 @@ public class ItsuTokenAutoConfiguration {
 							throws Exception {
 
 						if (properties.getWebRegister().isEnable()) {
+							if (Type.CUSTOM.name().equals(typeStr)) {
+								response.getWriter().write("Custom type do not support Web-register");
+								response.setStatus(403);
+								return false;
+							}
+							
 							if (ServletUtil.isLogin()) {
 								return true;
 							} else {
