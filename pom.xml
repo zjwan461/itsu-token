@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.itsu</groupId>
     <artifactId>itsu-token</artifactId>
-    <version>1.0.1</version>
+    <version>1.0</version>
     <name>itsu-token</name>
     <description>token check starter</description>
 
