@@ -19,7 +19,6 @@ import org.springframework.lang.NonNull;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.itsu.itsutoken.annotation.TableDesc;
 import com.itsu.itsutoken.configuration.ItsuTokenProperties;
@@ -33,7 +32,6 @@ import com.itsu.itsutoken.util.ClassUtil;
 import cn.hutool.core.annotation.AnnotationUtil;
 import cn.hutool.extra.spring.SpringUtil;
 
-@RequestMapping("/tokenData")
 public class TokenListController extends SuperController {
 
 	private static final Logger log = LoggerFactory.getLogger(TokenListController.class);
@@ -44,7 +42,7 @@ public class TokenListController extends SuperController {
 	@javax.annotation.Resource
 	private ItsuTokenProperties properties;
 
-	@GetMapping("/list")
+	@GetMapping("/tokenData/list")
 	public Map<String, Object> listData() throws Exception {
 		Map<String, Object> map = new LinkedHashMap<>();
 		String tableName = "tb_sys_token";
@@ -152,7 +150,7 @@ public class TokenListController extends SuperController {
 
 	}
 
-	@DeleteMapping("/{id}")
+	@DeleteMapping("/tokenData/{id}")
 	public String deleteById(@PathVariable("id") @NonNull String id) throws Exception {
 		// jdbcTemplate.update("delete from ", args)
 		String tableName = "tb_sys_token";
@@ -172,7 +170,7 @@ public class TokenListController extends SuperController {
 		return "success";
 	}
 
-	@DeleteMapping("/all")
+	@DeleteMapping("/tokenData/all")
 	public String deleteAll() throws Exception {
 		String tableName = "tb_sys_token";
 		if (properties.getType() == Type.SIMPLE) {

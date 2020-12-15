@@ -17,49 +17,49 @@ import cn.hutool.core.io.IoUtil;
 public class BaseController extends SuperController {
 
 	@javax.annotation.Resource
-    private ItsuTokenProperties properties;
+	private ItsuTokenProperties properties;
 
-    @RequestMapping("#{itsuTokenProperties.webRegister.registerUrl}")
-    public String registerPage() throws IOException {
-        ResourceLoader resourceLoader = new DefaultResourceLoader();
-        Resource resource = resourceLoader.getResource("classpath:html/registerToken.html");
-        return IoUtil.read(resource.getInputStream(), "UTF-8");
-    }
+	@RequestMapping("#{itsuTokenProperties.webRegister.registerUrl}")
+	public String registerPage() throws IOException {
+		ResourceLoader resourceLoader = new DefaultResourceLoader();
+		Resource resource = resourceLoader.getResource("classpath:html/registerToken.html");
+		return IoUtil.read(resource.getInputStream(), "UTF-8");
+	}
 
-    @PostMapping("/tokenLogin")
-    public String login(String user, String password) {
-        if (properties.getWebRegister().getUser().equals(user)
-                && properties.getWebRegister().getPassword().equals(password)) {
-            ServletUtil.login();
-            return properties.getWebRegister().getRegisterUrl();
-        } else {
-            ServletUtil.getResponse().setStatus(401);
-            return "Authorization error";
-        }
-    }
+	@PostMapping("/tokenLogin")
+	public String login(String user, String password) {
+		if (properties.getWebRegister().getUser().equals(user)
+				&& properties.getWebRegister().getPassword().equals(password)) {
+			ServletUtil.login();
+			return properties.getWebRegister().getRegisterUrl();
+		} else {
+			ServletUtil.getResponse().setStatus(401);
+			return "Authorization error";
+		}
+	}
 
-    @GetMapping("/login.html")
-    public String toLogin() throws Exception {
-        ResourceLoader resourceLoader = new DefaultResourceLoader();
-        Resource resource = resourceLoader.getResource("classpath:html/login.html");
-        return IoUtil.read(resource.getInputStream(), "UTF-8");
-    }
+	@GetMapping("#{itsuTokenProperties.webRegister.loginUrl}")
+	public String toLogin() throws Exception {
+		ResourceLoader resourceLoader = new DefaultResourceLoader();
+		Resource resource = resourceLoader.getResource("classpath:html/login.html");
+		return IoUtil.read(resource.getInputStream(), "UTF-8");
+	}
 
-    @GetMapping("/tokenListUrl")
-    public String listUrl() {
-        return properties.getWebRegister().getTokenListUrl();
-    }
+	@GetMapping("/tokenListUrl")
+	public String listUrl() {
+		return properties.getWebRegister().getTokenListUrl();
+	}
 
-    @GetMapping("/tokenRegisterUrl")
-    public String listRegisterUrl() {
-        return properties.getWebRegister().getRegisterUrl();
-    }
+	@GetMapping("/tokenRegisterUrl")
+	public String listRegisterUrl() {
+		return properties.getWebRegister().getRegisterUrl();
+	}
 
-    @GetMapping("#{itsuTokenProperties.webRegister.tokenListUrl}")
-    public String tokenListPage() throws Exception {
-        ResourceLoader resourceLoader = new DefaultResourceLoader();
-        Resource resource = resourceLoader.getResource("classpath:html/tokenList.html");
-        return IoUtil.read(resource.getInputStream(), "UTF-8");
-    }
+	@GetMapping("#{itsuTokenProperties.webRegister.tokenListUrl}")
+	public String tokenListPage() throws Exception {
+		ResourceLoader resourceLoader = new DefaultResourceLoader();
+		Resource resource = resourceLoader.getResource("classpath:html/tokenList.html");
+		return IoUtil.read(resource.getInputStream(), "UTF-8");
+	}
 
 }

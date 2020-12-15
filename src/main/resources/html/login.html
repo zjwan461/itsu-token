@@ -22,6 +22,7 @@
 
 </body>
 <script type="text/javascript">
+	var basePath = "/itsu-token";
     $.confirm({
         title: 'Login',
         content: '' +
@@ -53,13 +54,17 @@
 
                     $.ajax({
                         type: "post",
-                        url: "/tokenLogin",
+                        url: basePath + "/tokenLogin",
                         data: {
                             user: user,
                             password: pwd
                         },
                         success: function (res) {
-                            console.log(res)
+                        	if(res.indexOf("/") != 0){
+								res = basePath + "/" + res;                        		
+                        	} else {
+                        		res = basePath + res;
+                        	}
                             top.location.href = res;
                         },
                         error: function (error) {

@@ -15,7 +15,6 @@ import org.springframework.jdbc.core.PreparedStatementCallback;
 import org.springframework.lang.NonNull;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.itsu.itsutoken.annotation.TableDesc;
 import com.itsu.itsutoken.configuration.ItsuTokenProperties;
@@ -32,7 +31,6 @@ import cn.hutool.core.util.IdUtil;
 import cn.hutool.crypto.asymmetric.RSA;
 import cn.hutool.extra.spring.SpringUtil;
 
-@RequestMapping("/tokenRegister")
 public class TokenRegisterController extends SuperController {
 	private static final Logger log = LoggerFactory.getLogger(TokenRegisterController.class);
 
@@ -42,7 +40,7 @@ public class TokenRegisterController extends SuperController {
 	@javax.annotation.Resource
 	private ItsuTokenProperties properties;
 
-	@GetMapping("/generate/{system}")
+	@GetMapping("/tokenRegister/generate/{system}")
 	public Map<String, Object> generateToken(@PathVariable("system") @NonNull String system) throws Exception {
 		Map<String, Object> map = new HashMap<>();
 		String tableName = "tb_sys_token";
@@ -71,7 +69,7 @@ public class TokenRegisterController extends SuperController {
 				log.debug("user do not set set custom tableSample, will use default");
 			}
 		}
-		
+
 		if (properties.getType() == Type.SIMPLE) {
 			if (tableSampleClass == null)
 				tableSampleClass = SimpleTableSample.class;
@@ -122,7 +120,7 @@ public class TokenRegisterController extends SuperController {
 		return map;
 	}
 
-	@GetMapping("/type")
+	@GetMapping("/tokenRegister/type")
 	public Map<String, Object> getType() {
 		Map<String, Object> map = new HashMap<>();
 		map.put("status", true);

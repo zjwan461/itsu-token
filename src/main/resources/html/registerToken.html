@@ -81,6 +81,7 @@
     </div>
 </body>
 <script type="text/javascript">
+	var basePath = "/itsu-token";
     $(function () {
         setTimeout(function () {
             init();
@@ -90,7 +91,7 @@
         function init() {
             $.ajax({
                 type: "get",
-                url: "/tokenRegister/type",
+                url: basePath + "/tokenRegister/type",
                 data: {},
                 success: function (data) {
                     if (data.status) {
@@ -138,11 +139,10 @@
             }
 
             $(this).addClass("disabled").attr("disabled", "true")
-            //TODO CALL BACK END GENERATE TOKEN
             showLoading();
             $.ajax({
                 type: "get",
-                url: "/tokenRegister/generate/" + system,
+                url: basePath + "/tokenRegister/generate/" + system,
                 data: {},
                 success: function (res) {
                     if (res.status) {
@@ -210,9 +210,14 @@
         $("#tokenList").on('click', function () {
             $.ajax({
                 type: "get",
-                url: "/tokenListUrl",
+                url: basePath + "/tokenListUrl",
                 data: {},
                 success: function (res) {
+                	if(res.indexOf("/") != 0){
+						res = basePath + "/" + res;                        		
+                	} else {
+                		res = basePath + res;
+                	}
                     top.location.href = res;
                 }
             });

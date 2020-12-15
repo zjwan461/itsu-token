@@ -1,7 +1,6 @@
 package com.itsu.itsutoken.configuration;
 
 import java.util.Arrays;
-import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -16,6 +15,7 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -37,6 +37,12 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
 
+/**
+ * @ClassName:     ItsuTokenAutoConfiguration.java
+ * @Description:   itsu-token Spring Boot自动配置类
+ * @author         suben
+ * @Date           2020年12月15日 上午11:45:30
+ */
 @Configuration
 @ConditionalOnClass({ TokenChecker.class, DataSourceAutoConfiguration.class })
 @ConditionalOnProperty(name = "itsu-token.enable", havingValue = "true", matchIfMissing = false)
@@ -128,19 +134,19 @@ public class ItsuTokenAutoConfiguration {
 	public WebMvcConfigurer tokenRegisterWebMvcConfigurer(ItsuTokenProperties properties) {
 		return new WebMvcConfigurer() {
 
+			private String reloadUrl(String url) {
+				if (!StrUtil.startWith(url, "/")) {
+					url = "/" + url;
+				}
+				return "/" + Constants.PROJECT_NAME + url;
+			}
+
 			@Override
 			public void addInterceptors(InterceptorRegistry registry) {
-				String registerUrl = properties.getWebRegister().getRegisterUrl();
-				String tokenListUrl = properties.getWebRegister().getTokenListUrl();
+				String loginUrl = this.reloadUrl(properties.getWebRegister().getLoginUrl());
 				String type = properties.getType().name();
-				if (!StrUtil.startWith(registerUrl, "/")) {
-					registerUrl += "/" + registerUrl;
-				}
-				if (!StrUtil.startWith(tokenListUrl, "/")) {
-					tokenListUrl += "/" + tokenListUrl;
-				}
-				final String registerUrlStr = registerUrl;
-				final String tokenListUrlStr = tokenListUrl;
+
+				final String loginUrlStr = loginUrl;
 				final String typeStr = type;
 				registry.addInterceptor(new HandlerInterceptor() {
 
@@ -151,33 +157,38 @@ public class ItsuTokenAutoConfiguration {
 						if (properties.getWebRegister().isEnable()) {
 							if (Type.CUSTOM.name().equals(typeStr)) {
 								response.getWriter().write("Custom type do not support Web-register");
-								response.setStatus(403);
+								response.setStatus(HttpStatus.FORBIDDEN.value());
 								return false;
 							}
-							
+
 							if (ServletUtil.isLogin()) {
 								return true;
 							} else {
 								response.getWriter().write("Authorization error");
-								response.setStatus(401);
-								response.sendRedirect("login.html");
+								response.setStatus(HttpStatus.UNAUTHORIZED.value());
+								response.sendRedirect(loginUrlStr);
 								return false;
 							}
 						} else {
 							response.getWriter().write("itsu-token.web-register is not set to true");
+							response.setStatus(HttpStatus.FORBIDDEN.value());
 							return false;
 						}
 
 					}
-				}).addPathPatterns(registerUrlStr, tokenListUrlStr).addPathPatterns(Constants.LOGIN_IN_URLS);
+				}).addPathPatterns(Constants.INTERCEPTOR_PATTERN).excludePathPatterns(loginUrl,
+						Constants.SUB_TO_LOGIN_URL);
 			}
 
 		};
 	}
 
 	public static class Constants {
-		public static final List<String> LOGIN_IN_URLS = Arrays.asList("/tokenListUrl", "/tokenRegisterUrl",
-				"/tokenData/**", "/tokenRegister/**");
+		public static final String PROJECT_NAME = "itsu-token";
+
+		public static final String INTERCEPTOR_PATTERN = "/" + PROJECT_NAME + "/**";
+
+		public static final String SUB_TO_LOGIN_URL = "/" + PROJECT_NAME + "/tokenLogin";
 	}
 
 }
