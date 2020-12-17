@@ -6,6 +6,12 @@ import org.springframework.util.StringUtils;
 import com.itsu.itsutoken.table.SimpleTableSample;
 import com.itsu.itsutoken.table.TableSample;
 
+/**
+ * @ClassName:     ItsuTokenProperties.java
+ * @Description:   itsu-token spring boot properties类
+ * @author         Jerry Su
+ * @Date           2020年12月17日 下午4:17:05 
+ */
 @ConfigurationProperties(prefix = "itsu-token")
 public class ItsuTokenProperties {
 

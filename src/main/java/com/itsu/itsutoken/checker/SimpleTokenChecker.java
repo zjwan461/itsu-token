@@ -8,7 +8,6 @@ import javax.annotation.Resource;
 
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
-import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,7 +18,6 @@ import org.springframework.jdbc.core.PreparedStatementCallback;
 import org.springframework.util.StringUtils;
 
 import com.itsu.itsutoken.annotation.TableDesc;
-import com.itsu.itsutoken.annotation.Token;
 import com.itsu.itsutoken.configuration.ItsuTokenProperties;
 import com.itsu.itsutoken.exception.TokenCheckException;
 import com.itsu.itsutoken.table.SimpleTableSample;
@@ -31,6 +29,12 @@ import cn.hutool.core.annotation.AnnotationUtil;
 import cn.hutool.core.codec.Base64;
 import cn.hutool.extra.spring.SpringUtil;
 
+/**
+ * @ClassName: SimpleTokenChecker.java
+ * @Description: 简单token校验类
+ * @author Jerry Su
+ * @Date 2020年12月17日 下午4:27:41
+ */
 @Aspect
 public class SimpleTokenChecker extends TokenChecker<SimpleTableSample> {
 	private static final Logger log = LoggerFactory.getLogger(SimpleTokenChecker.class);
@@ -132,13 +136,13 @@ public class SimpleTokenChecker extends TokenChecker<SimpleTableSample> {
 
 	}
 
-	@Before("rule()&&@annotation(tokenAnno)")
-	public void before(JoinPoint joinPoint, Token tokenAnno) throws TokenCheckException {
-		if (tokenAnno.requried()) {
-			check(joinPoint);
-		} else {
-			log.info("token marked required is false, jump token check");
-		}
-	}
+//	@Before("rule()&&@annotation(tokenAnno)")
+//	public void before(JoinPoint joinPoint, Token tokenAnno) throws TokenCheckException {
+//		if (tokenAnno.requried()) {
+//			check(joinPoint);
+//		} else {
+//			log.info("token marked required is false, jump token check");
+//		}
+//	}
 
 }

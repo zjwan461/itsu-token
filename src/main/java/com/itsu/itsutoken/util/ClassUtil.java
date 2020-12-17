@@ -20,6 +20,12 @@ import org.springframework.util.StringUtils;
 
 import cn.hutool.core.annotation.AnnotationUtil;
 
+/**
+ * @ClassName: ClassUtil.java
+ * @Description: class util for itsu-token annotation
+ * @author Jerry Su
+ * @Date 2020年12月17日 上午11:29:27
+ */
 public class ClassUtil {
 
 	public static String getId(@NonNull Class<? extends TableSample> clazz) throws Exception {

@@ -31,6 +31,12 @@ import cn.hutool.core.util.IdUtil;
 import cn.hutool.crypto.asymmetric.RSA;
 import cn.hutool.extra.spring.SpringUtil;
 
+/**    
+ * @ClassName:     TokenRegisterController.java
+ * @Description:   token register 页所有接口
+ * @author         Jerry Su
+ * @Date           2020年12月17日 下午12:03:32 
+ */
 public class TokenRegisterController extends SuperController {
 	private static final Logger log = LoggerFactory.getLogger(TokenRegisterController.class);
 
@@ -40,7 +46,15 @@ public class TokenRegisterController extends SuperController {
 	@javax.annotation.Resource
 	private ItsuTokenProperties properties;
 
-	@GetMapping("/tokenRegister/generate/{system}")
+	/** 
+	 *  @author Jerry Su
+	 *  @param system
+	 *  @return
+	 *  @throws Exception
+	 *  @Description: 生成token 
+	 *  @Date 2020年12月17日 下午1:48:21
+	 */
+	@GetMapping("tokenRegister/generate/{system}")
 	public Map<String, Object> generateToken(@PathVariable("system") @NonNull String system) throws Exception {
 		Map<String, Object> map = new HashMap<>();
 		String tableName = "tb_sys_token";
@@ -120,7 +134,13 @@ public class TokenRegisterController extends SuperController {
 		return map;
 	}
 
-	@GetMapping("/tokenRegister/type")
+	/** 
+	 *  @author Jerry Su
+	 *  @return
+	 *  @Description: 获取token 类型 
+	 *  @Date 2020年12月17日 下午4:15:49
+	 */
+	@GetMapping("tokenRegister/type")
 	public Map<String, Object> getType() {
 		Map<String, Object> map = new HashMap<>();
 		map.put("status", true);
@@ -128,6 +148,15 @@ public class TokenRegisterController extends SuperController {
 		return map;
 	}
 
+	/** 
+	 *  @author Jerry Su
+	 *  @param sysName
+	 *  @param system
+	 *  @param tableName
+	 *  @return
+	 *  @Description: 检查当前system是否已注册过token 
+	 *  @Date 2020年12月17日 下午4:16:02
+	 */
 	public boolean checkSystem(String sysName, String system, String tableName) {
 		Integer count = jdbcTemplate.execute("select count(1) num from " + tableName + " where " + sysName + " = ?",
 				new PreparedStatementCallback<Integer>() {

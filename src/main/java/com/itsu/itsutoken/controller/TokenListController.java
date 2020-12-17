@@ -32,6 +32,12 @@ import com.itsu.itsutoken.util.ClassUtil;
 import cn.hutool.core.annotation.AnnotationUtil;
 import cn.hutool.extra.spring.SpringUtil;
 
+/**
+ * @ClassName: TokenListController.java
+ * @Description: token list页面上的所有接口
+ * @author Jerry Su
+ * @Date 2020年12月17日 下午12:00:57
+ */
 public class TokenListController extends SuperController {
 
 	private static final Logger log = LoggerFactory.getLogger(TokenListController.class);
@@ -42,6 +48,13 @@ public class TokenListController extends SuperController {
 	@javax.annotation.Resource
 	private ItsuTokenProperties properties;
 
+	/**
+	 * @author Jerry Su
+	 * @return
+	 * @throws Exception
+	 * @Description: token list接口
+	 * @Date 2020年12月17日 下午12:01:47
+	 */
 	@GetMapping("/tokenData/list")
 	public Map<String, Object> listData() throws Exception {
 		Map<String, Object> map = new LinkedHashMap<>();
@@ -69,7 +82,7 @@ public class TokenListController extends SuperController {
 				log.debug("user do not set set custom tableSample, will use default");
 			}
 		}
-		
+
 		if (properties.getType() == Type.SIMPLE) {
 			if (tableSampleClass == null)
 				tableSampleClass = SimpleTableSample.class;
@@ -78,29 +91,27 @@ public class TokenListController extends SuperController {
 			final String tokenValue = ClassUtil.getSimpleTokenValue(tableSampleClass);
 			final String sysNameStr = sysName;
 			final String tableId = ClassUtil.getId(tableSampleClass);
-			List list = jdbcTemplate.execute("select * from " + tableName,
-					new PreparedStatementCallback<List>() {
+			List list = jdbcTemplate.execute("select * from " + tableName, new PreparedStatementCallback<List>() {
 
-						@Override
-						public List doInPreparedStatement(PreparedStatement ps)
-								throws SQLException, DataAccessException {
-							List list = new ArrayList<>();
-							ResultSet rs = ps.executeQuery();
-							while (rs.next()) {
+				@Override
+				public List doInPreparedStatement(PreparedStatement ps) throws SQLException, DataAccessException {
+					List list = new ArrayList<>();
+					ResultSet rs = ps.executeQuery();
+					while (rs.next()) {
 //								SimpleTableSample tableSample = new SimpleTableSample();
 //								tableSample.setId(rs.getString(tableId));
 //								tableSample.setSystem_name(rs.getString(sysNameStr));
 //								tableSample.setToken(rs.getString(tokenValue));
 //								list.add(tableSample);
-								Map map = new HashMap<>();
-								map.put("id", rs.getString(tableId));
-								map.put("system_name", rs.getString(sysNameStr));
-								map.put("token", rs.getString(tokenValue));
-								list.add(map);
-							}
-							return list;
-						}
-					});
+						Map map = new HashMap<>();
+						map.put("id", rs.getString(tableId));
+						map.put("system_name", rs.getString(sysNameStr));
+						map.put("token", rs.getString(tokenValue));
+						list.add(map);
+					}
+					return list;
+				}
+			});
 			map.put("data", list);
 			map.put("type", Type.SIMPLE.name().toLowerCase());
 		} else if (properties.getType() == Type.RSA) {
@@ -112,32 +123,30 @@ public class TokenListController extends SuperController {
 			final String publicKeyValue = ClassUtil.getPublicKeyValue(tableSampleClass);
 			final String sysNameStr = sysName;
 			final String tableId = ClassUtil.getId(RSATableSample.class);
-			List list = jdbcTemplate.execute("select * from " + tableName,
-					new PreparedStatementCallback<List>() {
+			List list = jdbcTemplate.execute("select * from " + tableName, new PreparedStatementCallback<List>() {
 
-						@Override
-						public List doInPreparedStatement(PreparedStatement ps)
-								throws SQLException, DataAccessException {
-							List list = new ArrayList<>();
-							ResultSet rs = ps.executeQuery();
-							while (rs.next()) {
+				@Override
+				public List doInPreparedStatement(PreparedStatement ps) throws SQLException, DataAccessException {
+					List list = new ArrayList<>();
+					ResultSet rs = ps.executeQuery();
+					while (rs.next()) {
 //								RSATableSample rsaTableSample = new RSATableSample();
 //								rsaTableSample.setId(rs.getString(tableId));
 //								rsaTableSample.setSystem_name(rs.getString(sysNameStr));
 //								rsaTableSample.setPrivate_key(rs.getString(privateKeyValue));
 //								rsaTableSample.setPublic_key(rs.getString(publicKeyValue));
 //								list.add(rsaTableSample);
-								Map map = new HashMap<>();
-								map.put("id", rs.getString(tableId));
-								map.put("system_name", rs.getString(sysNameStr));
-								map.put("private_key", rs.getString(privateKeyValue));
-								map.put("public_key", rs.getString(publicKeyValue));
-								list.add(map);
-							}
-							return list;
-						}
+						Map map = new HashMap<>();
+						map.put("id", rs.getString(tableId));
+						map.put("system_name", rs.getString(sysNameStr));
+						map.put("private_key", rs.getString(privateKeyValue));
+						map.put("public_key", rs.getString(publicKeyValue));
+						list.add(map);
+					}
+					return list;
+				}
 
-					});
+			});
 			map.put("data", list);
 			map.put("type", Type.RSA.name().toLowerCase());
 		} else if (properties.getType() == Type.CUSTOM) {
@@ -150,6 +159,14 @@ public class TokenListController extends SuperController {
 
 	}
 
+	/**
+	 * @author Jerry Su
+	 * @param id
+	 * @return
+	 * @throws Exception
+	 * @Description: 通过id删除token记录
+	 * @Date 2020年12月17日 下午12:02:20
+	 */
 	@DeleteMapping("/tokenData/{id}")
 	public String deleteById(@PathVariable("id") @NonNull String id) throws Exception {
 		// jdbcTemplate.update("delete from ", args)
@@ -170,6 +187,13 @@ public class TokenListController extends SuperController {
 		return "success";
 	}
 
+	/**
+	 * @author Jerry Su
+	 * @return
+	 * @throws Exception
+	 * @Description: 删除所有token记录接口
+	 * @Date 2020年12月17日 下午12:02:55
+	 */
 	@DeleteMapping("/tokenData/all")
 	public String deleteAll() throws Exception {
 		String tableName = "tb_sys_token";

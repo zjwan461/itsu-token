@@ -38,10 +38,10 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
 
 /**
- * @ClassName:     ItsuTokenAutoConfiguration.java
- * @Description:   itsu-token Spring Boot自动配置类
- * @author         suben
- * @Date           2020年12月15日 上午11:45:30
+ * @ClassName: ItsuTokenAutoConfiguration.java
+ * @Description: itsu-token Spring Boot自动配置类
+ * @author suben
+ * @Date 2020年12月15日 上午11:45:30
  */
 @Configuration
 @ConditionalOnClass({ TokenChecker.class, DataSourceAutoConfiguration.class })
