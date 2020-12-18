@@ -10,7 +10,6 @@ import javax.annotation.Resource;
 
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
-import org.aspectj.lang.annotation.Before;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
@@ -20,7 +19,6 @@ import org.springframework.jdbc.core.PreparedStatementCallback;
 import org.springframework.util.StringUtils;
 
 import com.itsu.itsutoken.annotation.TableDesc;
-import com.itsu.itsutoken.annotation.Token;
 import com.itsu.itsutoken.configuration.ItsuTokenProperties;
 import com.itsu.itsutoken.exception.TokenCheckException;
 import com.itsu.itsutoken.table.RSATableSample;
@@ -49,14 +47,14 @@ public class RSATokenChecker extends TokenChecker<RSATableSample> {
 		this.setTableSample(new RSATableSample());
 	}
 
-	@Before("rule()&&@annotation(tokenAnno)")
-	public void before(JoinPoint joinPoint, Token tokenAnno) throws TokenCheckException {
-		if (tokenAnno.requried()) {
-			check(joinPoint);
-		} else {
-			log.info("token marked required is false, jump token check");
-		}
-	}
+//	@Before("rule()&&@annotation(tokenAnno)")
+//	public void before(JoinPoint joinPoint, Token tokenAnno) throws TokenCheckException {
+//		if (tokenAnno.requried()) {
+//			check(joinPoint);
+//		} else {
+//			log.info("token marked required is false, jump token check");
+//		}
+//	}
 
 	@Override
 	public void check(JoinPoint joinPoint) throws TokenCheckException {

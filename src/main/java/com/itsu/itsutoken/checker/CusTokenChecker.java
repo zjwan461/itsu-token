@@ -15,6 +15,12 @@ import cn.hutool.core.annotation.AnnotationUtil;
 import cn.hutool.core.exceptions.UtilException;
 import cn.hutool.extra.spring.SpringUtil;
 
+/**
+ * @ClassName: CusTokenChecker.java
+ * @Description: TODO(用一句话描述该文件做什么)
+ * @author Jerry Su
+ * @Date 2020年12月17日 下午4:26:46
+ */
 public abstract class CusTokenChecker<T extends TableSample> implements Checker {
 
 	protected T tableSample;

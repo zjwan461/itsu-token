@@ -6,6 +6,12 @@ import org.springframework.util.StringUtils;
 import com.itsu.itsutoken.table.SimpleTableSample;
 import com.itsu.itsutoken.table.TableSample;
 
+/**
+ * @ClassName:     ItsuTokenProperties.java
+ * @Description:   itsu-token spring boot properties类
+ * @author         Jerry Su
+ * @Date           2020年12月17日 下午4:17:05 
+ */
 @ConfigurationProperties(prefix = "itsu-token")
 public class ItsuTokenProperties {
 
@@ -127,6 +133,7 @@ public class ItsuTokenProperties {
 
 	public static class WebRegister {
 		private boolean enable = false;
+		private String loginUrl = "/login.html";
 		private String registerUrl = "/registerToken.html";
 		private String tokenListUrl = "/tokenList.html";
 		private String user = "admin";
@@ -170,6 +177,14 @@ public class ItsuTokenProperties {
 
 		public void setPassword(String password) {
 			this.password = password;
+		}
+
+		public String getLoginUrl() {
+			return loginUrl;
+		}
+
+		public void setLoginUrl(String loginUrl) {
+			this.loginUrl = loginUrl;
 		}
 
 	}

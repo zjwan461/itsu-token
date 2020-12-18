@@ -82,7 +82,7 @@
             </table>
             <p id="msg" class="text-center"></p>
             <button type="button" class="btn btn-danger" id="delAll">全部删除</button>
-            <a href="javascript:;" class="btn btn-link" id="tokenRegister"">注册token</a>
+            <a href="javascript:;" class="btn btn-link" id="tokenRegister">注册token</a>
         </div>
     </div>
 
@@ -93,6 +93,7 @@
         </div>
 </body>
 <script type="text/javascript">
+	var basePath = "/itsu-token";
     $(function () {
 
         setTimeout(function () {
@@ -102,7 +103,7 @@
         function init() {
             $.ajax({
                 type: "get",
-                url: "/tokenData/list",
+                url: basePath + "/tokenData/list",
                 data: {},
                 success: function (res) {
                     if (res.data && res.type) {
@@ -194,10 +195,9 @@
                                     text: 'confirm',
                                     btnClass: 'btn-blue',
                                     action: function () {
-                                        //TODO DELETE BY ID
                                         $.ajax({
                                             type: "delete",
-                                            url: "/tokenData/" + id,
+                                            url: basePath + "/tokenData/" + id,
                                             data: {},
                                             success: function (res) {
                                                 $.dialog(res);
@@ -240,9 +240,14 @@
         $("#tokenRegister").on('click', function () {
             $.ajax({
                 type: "get",
-                url: "/tokenRegisterUrl",
+                url: basePath + "/tokenRegisterUrl",
                 data: {},
                 success: function (res) {
+                	if(res.indexOf("/") != 0){
+						res = basePath + "/" + res;                        		
+                	} else {
+                		res = basePath + res;
+                	}
                     top.location.href = res;
                 }
             });
@@ -261,7 +266,7 @@
                             //TODO DELETE ALL
                             $.ajax({
                                 type: "delete",
-                                url: "/tokenData/all",
+                                url: basePath + "/tokenData/all",
                                 data: {},
                                 success: function (res) {
                                     $.dialog(res);

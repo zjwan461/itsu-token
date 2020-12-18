@@ -6,50 +6,57 @@ import com.itsu.itsutoken.annotation.SysName;
 import com.itsu.itsutoken.annotation.TableDesc;
 import com.itsu.itsutoken.annotation.TableId;
 
+/**
+ * 
+ * @ClassName: RSATableSample.java
+ * @Description: table sample for RSA token type
+ * @author Jerry Su
+ * @Date 2020年12月17日 上午10:36:35
+ */
 @TableDesc
 public class RSATableSample implements TableSample {
 
-    @TableId
-    private String id;
+	@TableId
+	private String id;
 
-    @SysName
-    private String system_name;
+	@SysName
+	private String system_name;
 
-    @PrivateKey
-    private String private_key;
+	@PrivateKey
+	private String private_key;
 
-    @PublicKey
-    private String public_key;
+	@PublicKey
+	private String public_key;
 
-    public String getId() {
-        return id;
-    }
+	public String getId() {
+		return id;
+	}
 
-    public void setId(String id) {
-        this.id = id;
-    }
+	public void setId(String id) {
+		this.id = id;
+	}
 
-    public String getSystem_name() {
-        return system_name;
-    }
+	public String getSystem_name() {
+		return system_name;
+	}
 
-    public void setSystem_name(String system_name) {
-        this.system_name = system_name;
-    }
+	public void setSystem_name(String system_name) {
+		this.system_name = system_name;
+	}
 
-    public String getPrivate_key() {
-        return private_key;
-    }
+	public String getPrivate_key() {
+		return private_key;
+	}
 
-    public void setPrivate_key(String private_key) {
-        this.private_key = private_key;
-    }
+	public void setPrivate_key(String private_key) {
+		this.private_key = private_key;
+	}
 
-    public String getPublic_key() {
-        return public_key;
-    }
+	public String getPublic_key() {
+		return public_key;
+	}
 
-    public void setPublic_key(String public_key) {
-        this.public_key = public_key;
-    }
+	public void setPublic_key(String public_key) {
+		this.public_key = public_key;
+	}
 }
