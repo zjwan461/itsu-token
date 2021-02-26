@@ -137,23 +137,37 @@
                                 $("#msg").append("no data found");
                             }
 
-                            res.data.forEach(ele => {
+                            // res.data.forEach(ele => {
+                            //     var content = "<tr>";
+                            //     for (const e in ele) {
+                            //         if (e == 'private_key' || e == 'public_key') {
+                            //             content += "<td class='ellipsis-default'>" + ele[
+                            //                     e] +
+                            //                 "</td>\n";
+                            //         } else {
+                            //             content += "<td>" + ele[e] + "</td>\n";
+                            //         }
+                            //     }
+                            //     content += `<td>
+                            //                     <button type="button" class="btn btn-warning btn-xs single-del">删除</button>
+                            //                 </td>`;
+                            //     content += "</tr>"
+                            //     $("#data").append(content);
+                            // });
+
+                            $.each(res.data, function(index, item){
                                 var content = "<tr>";
-                                for (const e in ele) {
-                                    if (e == 'private_key' || e == 'public_key') {
-                                        content += "<td class='ellipsis-default'>" + ele[
-                                                e] +
-                                            "</td>\n";
-                                    } else {
-                                        content += "<td>" + ele[e] + "</td>\n";
-                                    }
-                                }
+                                content += "<td>" + item.id + "</td>\n";
+                                content += "<td>" + item.system_name + "</td>\n";
+                                content += "<td class='ellipsis-default'>" + item.private_key + "</td>\n";
+                                content += "<td class='ellipsis-default'>" + item.public_key + "</td>\n";
                                 content += `<td>
-                                                <button type="button" class="btn btn-warning btn-xs single-del">删除</button>
-                                            </td>`;
+                                    <button type="button" class="btn btn-warning btn-xs single-del">删除</button>
+                                </td>`;
                                 content += "</tr>"
                                 $("#data").append(content);
-                            });
+                            })
+
                         } else {
                             $.confirm({
                                 title: 'Error!',
